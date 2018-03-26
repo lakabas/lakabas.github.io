@@ -1,6 +1,6 @@
 ## Data Visualizations
 
-[NBA Shooting Data](levakabas.github.io/INFO3300Project1/project.html)
+[NBA Shooting Data](/INFO3300Project1/project.html)
 
 ### About Me
 
