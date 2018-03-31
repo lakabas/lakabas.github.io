@@ -18,9 +18,10 @@
 ## Interviews 
 
 [Chris Fenton, film producer](http://cornellsun.com/2018/03/20/interview-with-blockers-producer-chris-fenton-93/) <br>
+[Patrick Patterson, Oklahoma City Thunder forward](http://www.slamonline.com/nba/patrick-patterson-interview/) <br>
 [David Pizzaro, psychology professor](http://sunspots.cornellsun.com/2017/05/28/podcast-psychology-professor-david-pizarro/) <br>
 [Postmodern Jukebox](http://cornellsun.com/2015/11/09/a-show-and-a-chat-postmodern-jukebox-at-the-state-theatre/) <br>
-[Patrick Patterson, Oklahoma City Thunder forward](http://www.slamonline.com/nba/patrick-patterson-interview/) <br>
+[Brian Yorkey, Tony Award winning playwright](/Brian_Yorkey_interview.pdf)
 
 ## NBA Coverage for Slam Magazine
 
