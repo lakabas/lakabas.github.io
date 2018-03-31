@@ -4,7 +4,7 @@
 
 ### Movie Reviews
 
-[The Shape of Water](http://cornellsun.com/2018/01/24/the-shape-of-water-is-a-fairytale-for-adults/)
+[The Shape of Water](http://cornellsun.com/2018/01/24/the-shape-of-water-is-a-fairytale-for-adults/) <br>
 [Blade Runner 2049](http://cornellsun.com/2017/10/11/blade-runner-2049-might-just-be-a-masterpiece/)
 [Split](http://cornellsun.com/2017/02/05/holy-split-signs-of-m-night-shyamalans-return-are-happening/)
 [Jason Bourne](http://cornellsun.com/2016/10/11/stale-popcorn-is-still-popcorn-jason-borne-is-still-jason-bourne/)
