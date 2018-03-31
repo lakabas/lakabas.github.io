@@ -2,7 +2,9 @@
 
 [NBA Shooting Data](/INFO3300Project1/project.html)
 
-### Movie Reviews
+## Blogs
+
+## Movie Reviews
 
 [The Shape of Water](http://cornellsun.com/2018/01/24/the-shape-of-water-is-a-fairytale-for-adults/) <br>
 [Blade Runner 2049](http://cornellsun.com/2017/10/11/blade-runner-2049-might-just-be-a-masterpiece/) <br>
@@ -13,11 +15,19 @@
 [Beasts of No Nation](http://cornellsun.com/2015/10/23/netflixs-beasts-of-no-nation/) <br>
 [The Walk](http://cornellsun.com/2015/10/18/living-vicariously-through-the-walk/) <br>
 
-### Interviews 
+## Interviews 
 
-[Film Producer Chris Fenton](http://cornellsun.com/2018/03/20/interview-with-blockers-producer-chris-fenton-93/) <br>
-[Psychology Professor David Pizzaro](http://sunspots.cornellsun.com/2017/05/28/podcast-psychology-professor-david-pizarro/) <br>
+[Chris Fenton, film producer](http://cornellsun.com/2018/03/20/interview-with-blockers-producer-chris-fenton-93/) <br>
+[David Pizzaro, psychology professor](http://sunspots.cornellsun.com/2017/05/28/podcast-psychology-professor-david-pizarro/) <br>
 [Postmodern Jukebox](http://cornellsun.com/2015/11/09/a-show-and-a-chat-postmodern-jukebox-at-the-state-theatre/) <br>
+[Patrick Patterson, Oklahoma City Thunder forward](http://www.slamonline.com/nba/patrick-patterson-interview/) <br>
+
+## NBA Coverage for Slam Magazine
+
+[Slam Top 50: Paul Millsap, No. 38](http://www.slamonline.com/nba/paul-millsap-slam-top-50-2017/) <br>
+[Slam Top 50: Jrue Holiday, No. 46](http://www.slamonline.com/nba/jrue-holiday-slam-top-50-2017/) <br>
+[25 Years Later: The Kicks of the Dream Team](http://www.slamonline.com/kicks/the-kicks-of-the-dream-team/) <br>
+[Shaquille O'Neal, Alonzo Mourning Team Up for Amex Event](http://www.slamonline.com/nba/shaquille-oneal-alonzo-mourning-amex/) <br>
 
 ### About Me
 
