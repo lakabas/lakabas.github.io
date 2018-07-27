@@ -47,7 +47,7 @@
 [Shaquille O'Neal, Alonzo Mourning Team Up for Amex Event](http://www.slamonline.com/nba/shaquille-oneal-alonzo-mourning-amex/) <br>
 
 ## Interviews 
-
+[Art Garfunkel, singer/songwriter](http://cornellsun.com/2018/05/06/interview-with-art-garfunkel/)<br>
 [Chris Fenton, film producer](http://cornellsun.com/2018/03/20/interview-with-blockers-producer-chris-fenton-93/) <br>
 [Patrick Patterson, Oklahoma City Thunder forward](http://www.slamonline.com/nba/patrick-patterson-interview/) <br>
 [David Pizzaro, Cornell psychology professor](http://sunspots.cornellsun.com/2017/05/28/podcast-psychology-professor-david-pizarro/) <br>
