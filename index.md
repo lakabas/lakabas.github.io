@@ -1,6 +1,7 @@
 ## Data Visualizations
 
 [NBA Shot Selection Evolution](/INFO3300Project1/project.html)
+[United States City Skyline Comparison](/INFO3300proj2/index.html)
 
 ## Blogs / Columns
 
