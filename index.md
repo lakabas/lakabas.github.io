@@ -20,6 +20,7 @@
 
 #### Sports
 
+[Stop Complaining About a Perfectly Good NBA Finals Matchup](http://sunspots.cornellsun.com/2018/05/31/akabas-stop-complaining-about-a-perfectly-good-nba-finals-matchup/) <br>
 [10 NBA Offseason Questions, Asked and Answered](http://sunspots.cornellsun.com/2017/06/30/akabas-10-nba-offseason-questions-asked-and-answered/) <br>
 [10 NBA Finals Questions, Asked and Answered](http://sunspots.cornellsun.com/2017/06/16/10-nba-finals-questions-asked-and-answered/) <br>
 [6 Things the NBA Could Do with the Rookie of the Year Trophy](http://sunspots.cornellsun.com/2017/04/21/akabas-what-should-the-nba-do-with-the-rookie-of-the-year-trophy/) <br>
@@ -29,6 +30,7 @@
 
 #### Miscellaneous
 
+[A Definitive Ranking of Fruits](http://sunspots.cornellsun.com/2018/05/04/akabas-a-definitive-ranking-of-fruits/) <br>
 [On James Harden, and Why Cereal Isn't a Breakfast Food](http://sunspots.cornellsun.com/2017/11/03/food-week-james-harden-and-why-cereal-is-actually-not-a-breakfast-food/) <br>
 [If Cornell Majors Were Halloween Candies](http://sunspots.cornellsun.com/2017/10/29/food-week-if-cornell-majors-were-halloween-candies/) <br>
 [24 Moonlit Memes](http://sunspots.cornellsun.com/2017/02/27/24-moonlit-memes/) <br>
@@ -58,6 +60,7 @@
 
 ## Movie Reviews
 
+[Cornell's 5th Centrally Isolated Film Festival](http://cornellsun.com/2018/04/18/cornells-fifth-centrally-isolated-film-festival-showcases-student-films/) <br>
 [The Shape of Water](http://cornellsun.com/2018/01/24/the-shape-of-water-is-a-fairytale-for-adults/) <br>
 [Blade Runner 2049](http://cornellsun.com/2017/10/11/blade-runner-2049-might-just-be-a-masterpiece/) <br>
 [Split](http://cornellsun.com/2017/02/05/holy-split-signs-of-m-night-shyamalans-return-are-happening/) <br>
