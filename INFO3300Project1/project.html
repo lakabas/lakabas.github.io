@@ -1,6 +1,6 @@
 <html>
 <head>
-<title>INFO 3300 - Project Start</title>
+<title>NBA Shot Chart Evolution</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link href="https://fonts.googleapis.com/css?family=Oswald" rel="stylesheet">
 <script src='https://d3js.org/d3.v4.min.js'></script>
@@ -48,8 +48,7 @@ text {
 }
 p {
   text-align: justify;
-  font-family: 'Georgia', sans-serif;
-  padding:1em; 
+  font-family: 'Georgia', sans-serif; 
   width:80%;
   margin-left: 10%; 
   margin-right: 10%;
@@ -65,7 +64,7 @@ p {
   background-size: 700px 470px;
   background-position: -100px; 
 }
-@media only screen and (max-width: 1200px) {
+@media only screen and (max-width: 800px) {
 #key1, #key2, #key3, #key4, #key5, #key6{
   
   margin:1em;
@@ -74,9 +73,8 @@ p {
   margin:auto;
 }
 }
-@media only screen and (min-width: 1200px){
+@media only screen and (min-width: 800px){
   #key1, #key2, #key3, #key4, #key5, #key6{
-  width: 43%;
   padding: 1em;
   display: inline-block;
 }
@@ -84,8 +82,7 @@ p {
 
 .container {
   background-color: #263238;
-  height: 4000px;
-  width: 100%;
+  height: 4300px;
 }
 
 #graphic {
@@ -121,7 +118,7 @@ p {
 
 </style>
 </head>
-<body>
+<body onresize="func()">
 
 
 
@@ -132,12 +129,13 @@ p {
       <!-- img link: http://bleacherreport.com/nba -->
       <h1>The Evolution of NBA Shooting</h1>
 
-      <p> In the 1980 season, the National Basketball Association added the three point shot and the players had no freaking clue what to do with it. That year, teams attempted fewer than three shots from distance per game and hit them at a disastrous 28% clip. The NBA Finals featured one made three-pointer. Brian Taylor was the Steph Curry of that season, having previously played in the ABA (which introduced the three-pointer several years prior); he launched a whopping 3.1 threes per game and knocked them down at a blistering 37.7% rate (a hair above 2018's league average). Things didn't change quickly. A few years later, Michael Cooper's 38 made threes were good for second in the league, and it wasn't until 1987 that the world's best basketball players were shooting a collective 30% from behind the line. <br><br> In the modern NBA, playing a five-man lineup with fewer than four adept three-point shooters is basically suicide. The game is changing in a major way. The Golden State Warriors have built a dynasty by spreading the floor and taking three pointers at historic rates, and the Houston Rockets nearly upended them last season by pushing the envelope even farther. But to what extent has evolution in shot selection led to more efficient offense league-wide? Using data from nba.stats.com, we analyzed the frequency of shots taken at different locations on the court and the effectiveness of those shot attempts during every single season over the past two decades. </p>
+      <p> In the 1980 season, the National Basketball Association added the three point shot and the players had no freaking clue what to do with it. That year, teams attempted fewer than three shots from distance per game and hit them at a disastrous 28% clip. The NBA Finals featured one made three-pointer. Brian Taylor was the Steph Curry of that season, having previously played in the ABA (which introduced the three-pointer several years prior); he launched a whopping 3.1 threes per game and knocked them down at a blistering 37.7% rate (a hair above 2018's league average). Things didn't change quickly. A few years later, Michael Cooper's 38 made threes were good for second in the league, and it wasn't until 1987 that the world's best basketball players were shooting a collective 30% from behind the line. <br><br> In the modern NBA, playing a five-man lineup with fewer than four adept three-point shooters is basically suicide. The game is changing in a major way. The Golden State Warriors have built a dynasty by spreading the floor and taking three pointers at historic rates, and the Houston Rockets nearly upended them last season by pushing the envelope even farther. But to what extent has evolution in shot selection led to more efficient offense league-wide? Using data from nba.stats.com, we analyzed the frequency of shots taken at different locations on the court and the effectiveness of those shot attempts during every single season over the past two decades. </p> <br><br>
     
     </div>
 
   <div class="container">
-    <svg id="key3" width ="600" height="90">
+    <br><br>
+    <svg id="key3" width ="350" height="90">
               <defs>
 
       <linearGradient id="efficiency">
@@ -154,29 +152,30 @@ p {
         .stop4 { stop-color: #0c9600}
       ]]></style>
   </defs>
-    <text x="40" y="30" alignment-baseline="middle" text-anchor="middle"> Points Per Attempt: </text>
-    <rect id="rect1" x="100" y="10" rx="15" ry="15" width="400" height="40"/>
-    <text x="90" y="70" alignment-baseline="middle" text-anchor="middle"> 0.7 </text>
-    <text x="290" y="70" alignment-baseline="middle" text-anchor="middle"> 1 </text>
-    <text x="490" y="70" alignment-baseline="middle" text-anchor="middle"> 1.3 </text>
+    <text x="175" alignment-baseline="middle" text-anchor="middle"> Points Per Attempt </text>
+    <rect id="rect1" x="25" y="10" rx="15" ry="15" width="300" height="40"/>
+    <text x="25" y="70" alignment-baseline="middle" text-anchor="middle"> 0.7 </text>
+    <text x="175" y="70" alignment-baseline="middle" text-anchor="middle"> 1 </text>
+    <text x="325" y="70" alignment-baseline="middle" text-anchor="middle"> 1.3 </text>
     
     </svg>
-    <svg id="key4" width ="500" height="80">
-    <text x="30" y="20" alignment-baseline="middle" text-anchor="middle"> Shot Frequency: </text>
-    <text x="100" y="70" alignment-baseline="middle" text-anchor="middle"> Low </text>
-    <text x="250" y="70" alignment-baseline="middle" text-anchor="middle"> Medium </text>
-    <text x="400" y="70" alignment-baseline="middle" text-anchor="middle"> High </text>
+    <svg id="key4" width ="350" height="90">
+    <text x="175" alignment-baseline="middle" text-anchor="middle"> Shot Frequency </text>
+    <text x="25" y="70" alignment-baseline="middle" text-anchor="middle"> Low </text>
+    <text x="175" y="70" alignment-baseline="middle" text-anchor="middle"> Medium </text>
+    <text x="325" y="70" alignment-baseline="middle" text-anchor="middle"> High </text>
     </svg>
     
     <script>
       var svg = d3.select("#key4");
       for (var i = 0; i < 8; i++){
         svg.append('circle')
-        .attr('cx', 50 + (50 * i))
+        .attr('cx', -25 + (50 * i))
         .attr('cy', 20)
         .attr('r', i)
         .attr('fill', "white");
       }
+
       // Code taken from http://vallandingham.me/scroller.html
 
 /**
@@ -360,6 +359,10 @@ I bet the eradication of these shots is where we're headed next. Organizations h
 
   <script>
     var svg0 = d3.select('#zero');
+    var end = 4070;
+    if (window.innerWidth < 800){
+      end = 4180 + (800 - window.innerWidth);
+    } 
 
     var lastIndex = -1;
     var activeIndex = 0;
@@ -462,20 +465,51 @@ I bet the eradication of these shots is where we're headed next. Organizations h
           .type(d3.annotationLabel)
           .annotations(annotations2)
 
-// scale number of shot attempts to size of circle
-var rScale = d3.scaleSqrt()
-.domain([20,300])
-.range([0, 8])
 // scale effective percentage to color of circle
 var colorScale = d3.scaleLinear()
   .domain([.35, .45, .55, .65])
   .range(["#e02900", "#ffcc00", "#72af01", "#0c9600"])
+
+  function func(){
+    console.log(window.innerWidth);
+    if (window.innerWidth < 800){
+      end = 4170 + (800 - window.innerWidth);
+    } else {
+      end = 4070;
+    }
+  }
+
+  var shiftScale = d3.scaleLinear()
+  .domain([500, 359])
+  .range([-100, -94])
 
 // iteratre through all elements of the 2D arrays, each value of which represents makes/attempts for a specific sqaure-foot of the court
 function slide(y){
   svg0.selectAll("*").remove();
   document.getElementById("head").innerHTML = (y-1).toString() + "-" + y.toString().substring(2,4) + " Season";
   var year = y - 1998;
+  var w = 500;
+  console.log(w);
+  var shift = 10;
+  var h = 470; 
+  var maxradius = 8;
+  var style = "background-size: 700px 470px; background-position -100px;";
+
+  if (window.innerWidth < 539) {
+    w = window.innerWidth - 40;
+    h = .94 * w;
+    shift = shift * w / 500;
+    maxradius = maxradius * w / 500;
+    style = "background-size: " + w * (700 / 500) + "px " + h + "px; background-position: " + w * (shiftScale(w) / 500) + "px 19px;";
+  }
+
+  svg0.attr('width', w).attr("style", style);
+
+  // scale number of shot attempts to size of circle
+  var rScale = d3.scaleSqrt()
+  .domain([20,300])
+  .range([0, maxradius]);
+
 
   /*if (y == 1998){
     svg0
@@ -505,17 +539,17 @@ function slide(y){
       // append a circle to the SVG at the coordinates determined by the indeces of the array
       if (attempts2[year][i][j] > 20 && attempts2[year][i][j] < 300) {
           svg0.append('circle')
-        .attr('cx', i*10-10)
-        .attr('cy', 470 - (j*10+10))
+        .attr('cx', i*shift-shift)
+        .attr('cy', h - (j*shift+shift))
         .attr('r', rScale(attempts2[year][i][j]+0.01))
         .attr('fill', color)
       }
       // for large outliers in number of attempts, manually set the radius to larger than those on the scale
       else if (attempts2[year][i][j] > 20) {
         svg0.append('circle')
-          .attr('cx', i*10-10)
-          .attr('cy', 470 - (j*10+10))
-          .attr('r', 9)
+          .attr('cx', i*shift-shift)
+          .attr('cy', h - (j*shift+shift))
+          .attr('r', maxradius + 1)
           .style('fill', color)
       }
     }
@@ -538,7 +572,7 @@ function slide(y){
       } else if (i == 0 && sign == -1) {
         d3.select('#viz').attr("style", "position: absolute");
       } else if (i == 25 && sign == 1){
-        d3.select('#viz').attr("style", "position: absolute; top: 3825px;");
+        d3.select('#viz').attr("style", "position: absolute; top: " + end + "px;");
       } else if (i == 24 && sign == -1) {
         d3.select('#viz').attr("style", "position: fixed; top: 50px;");
       }
