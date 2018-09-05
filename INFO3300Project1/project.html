@@ -8,162 +8,48 @@
 <script src='scroller.js'</script>
 <script src='//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/highlight.min.js'></script>
 <script src="https://rawgit.com/susielu/d3-annotation/master/d3-annotation.min.js"></script>
-
-<style>
-body{
-  background-color: white;
-  color: #263238;
-  font-family: 'Oswald', sans-serif;
-  text-align: center;
-}
-img{
-  display: inline-block;
-  width:10%;
-  vertical-align: middle;
-}
-h1{
-  display: inline-block;
-  vertical-align: middle;
-}
-h2{
-  display: block;
-  width: 90%;
-  margin: auto;
-  text-align: center;
-  padding: 0.5em;
-  font-size: 30px;
-  color: #263238;
-}
-h3{
-  display: block;
-  width: 90%;
-  margin: auto;
-  text-align: center;
-  padding: 0.5em;
-  font-size: 30px;
-  color: white;
-}
-text {
-  fill: white;
-}
-p {
-  text-align: justify;
-  font-family: 'Georgia', sans-serif; 
-  width:80%;
-  margin-left: 10%; 
-  margin-right: 10%;
-}
-
-#zero, #one, #two{
-  margin:1em;
-  padding: 1em;
-  display: block;
-  margin: auto;
-  background-image: url("court.png");
-  background-repeat: no-repeat;
-  background-size: 700px 470px;
-  background-position: -100px; 
-}
-@media only screen and (max-width: 800px) {
-#key1, #key2, #key3, #key4, #key5, #key6{
-  
-  margin:1em;
-  padding: 1em;
-  display: block;
-  margin:auto;
-}
-}
-@media only screen and (min-width: 800px){
-  #key1, #key2, #key3, #key4, #key5, #key6{
-  padding: 1em;
-  display: inline-block;
-}
-}
-
-.container {
-  background-color: #263238;
-  height: 4300px;
-}
-
-#graphic {
-  padding-top: 60px;
-}
-
-#sections {
-  position: relative;
-  display: inline-block;
-  width: 1px;
-  top: 0px;
-  z-index: 90;
-  padding-bottom: 200px;
-  float: left;
-}
-
-.step {
-  margin-bottom: 100px;
-  font-size: 0px;
-  line-height: 23px;
-  color: #767678;
-}
-
-#viz {
-  display: block;
-  position: absolute;
-  margin: auto;
-  z-index: 1;
-  height: 800px;  
-  width: 100%;
-  /* background-color: #ddd; */
-}
-
-</style>
+<link rel="stylesheet" href="style.css">
 </head>
 <body onresize="func()">
 
-
-
 <div id="background" >
-
     <div style="width:100%; text-align: center">
       <img alt="http://bleacherreport.com/nba" src="nba.png" ></img>
-      <!-- img link: http://bleacherreport.com/nba -->
       <h1>The Evolution of NBA Shooting</h1>
 
       <p> In the 1980 season, the National Basketball Association added the three point shot and the players had no freaking clue what to do with it. That year, teams attempted fewer than three shots from distance per game and hit them at a disastrous 28% clip. The NBA Finals featured one made three-pointer. Brian Taylor was the Steph Curry of that season, having previously played in the ABA (which introduced the three-pointer several years prior); he launched a whopping 3.1 threes per game and knocked them down at a blistering 37.7% rate (a hair above 2018's league average). Things didn't change quickly. A few years later, Michael Cooper's 38 made threes were good for second in the league, and it wasn't until 1987 that the world's best basketball players were shooting a collective 30% from behind the line. <br><br> In the modern NBA, playing a five-man lineup with fewer than four adept three-point shooters is basically suicide. The game is changing in a major way. The Golden State Warriors have built a dynasty by spreading the floor and taking three pointers at historic rates, and the Houston Rockets nearly upended them last season by pushing the envelope even farther. But to what extent has evolution in shot selection led to more efficient offense league-wide? Using data from nba.stats.com, we analyzed the frequency of shots taken at different locations on the court and the effectiveness of those shot attempts during every single season over the past two decades. </p> <br><br>
     
     </div>
 
-  <div class="container">
+  <div id="container">
     <br><br>
-    <svg id="key3" width ="350" height="90">
-              <defs>
-
-      <linearGradient id="efficiency">
-        <stop class="stop1" offset="0%"/>
-        <stop class="stop2" offset="33%"/>
-        <stop class="stop3" offset="66%"/>
-        <stop class="stop4" offset="100%"
-      </linearGradient>
-      <style type="text/css"><![CDATA[
-        #rect1 { fill: url(#efficiency); }
-        .stop1 { stop-color: #e02900; }
-        .stop2 { stop-color: #ffcc00; stop-opacity: 1; }
-        .stop3 { stop-color: #72af01; }
-        .stop4 { stop-color: #0c9600}
-      ]]></style>
-  </defs>
-    <text x="175" alignment-baseline="middle" text-anchor="middle"> Points Per Attempt </text>
-    <rect id="rect1" x="25" y="10" rx="15" ry="15" width="300" height="40"/>
-    <text x="25" y="70" alignment-baseline="middle" text-anchor="middle"> 0.7 </text>
-    <text x="175" y="70" alignment-baseline="middle" text-anchor="middle"> 1 </text>
-    <text x="325" y="70" alignment-baseline="middle" text-anchor="middle"> 1.3 </text>
-    
+    <svg id="key3" width="350" height="90">
+      <defs>
+        <linearGradient id="efficiency">
+          <stop class="stop1" offset="0%"/>
+          <stop class="stop2" offset="33%"/>
+          <stop class="stop3" offset="66%"/>
+          <stop class="stop4" offset="100%"
+        </linearGradient>
+        <style type="text/css"><![CDATA[
+          #rect1 { fill: url(#efficiency); }
+          .stop1 { stop-color: #e02900; }
+          .stop2 { stop-color: #ffcc00; stop-opacity: 1; }
+          .stop3 { stop-color: #72af01; }
+          .stop4 { stop-color: #0c9600}
+        ]]></style>
+       </defs>
+      <text x="175" alignment-baseline="middle" text-anchor="middle"> Points Per Attempt </text>
+      <rect id="rect1" x="25" y="10" rx="15" ry="15" width="300" height="40"/>
+      <text x="25" y="70" alignment-baseline="middle" text-anchor="middle"> 0.7 </text>
+      <text x="175" y="70" alignment-baseline="middle" text-anchor="middle"> 1 </text>
+      <text x="325" y="70" alignment-baseline="middle" text-anchor="middle"> 1.3 </text>
     </svg>
     <svg id="key4" width ="350" height="90">
-    <text x="175" alignment-baseline="middle" text-anchor="middle"> Shot Frequency </text>
-    <text x="25" y="70" alignment-baseline="middle" text-anchor="middle"> Low </text>
-    <text x="175" y="70" alignment-baseline="middle" text-anchor="middle"> Medium </text>
-    <text x="325" y="70" alignment-baseline="middle" text-anchor="middle"> High </text>
+      <text x="175" alignment-baseline="middle" text-anchor="middle"> Shot Frequency </text>
+      <text x="25" y="70" alignment-baseline="middle" text-anchor="middle"> Low </text>
+      <text x="175" y="70" alignment-baseline="middle" text-anchor="middle"> Medium </text>
+      <text x="325" y="70" alignment-baseline="middle" text-anchor="middle"> High </text>
     </svg>
     
     <script>
@@ -176,15 +62,9 @@ p {
         .attr('fill', "white");
       }
 
-      // Code taken from http://vallandingham.me/scroller.html
+// Code taken from http://vallandingham.me/scroller.html
 
-/**
- * scroller - handles the details
- * of figuring out which section
- * the user is currently scrolled
- * to.
- *
- */
+// scroller - handles the details of figuring out which section the user is currently scrolled to. 
 function scroller() {
   var container = d3.select('body');
   // event dispatcher
@@ -200,13 +80,8 @@ function scroller() {
   var containerStart = 0;
 
   /**
-   * scroll - constructor function.
-   * Sets up scroller to monitor
-   * scrolling of els selection.
-   *
-   * @param els - d3 selection of
-   *  elements that will be scrolled
-   *  through by user.
+   * scroll - constructor function. Sets up scroller to monitor scrolling of els selection.
+   * @param els - d3 selection of elements that will be scrolled through by user.
    */
   function scroll(els) {
     sections = els;
@@ -227,11 +102,7 @@ function scroller() {
     });
   }
 
-  /**
-   * resize - called initially and
-   * also when page is resized.
-   * Resets the sectionPositions
-   */
+  // resize - called initially and also when page is resized. Resets the sectionPositions 
   function resize() {
     // sectionPositions will be each sections starting position relative to the top of the first section.
     sectionPositions = [];
@@ -246,13 +117,7 @@ function scroller() {
     containerStart = container.node().getBoundingClientRect().top + window.pageYOffset;
   }
 
-  /**
-   * position - get current users position.
-   * if user has scrolled to new section,
-   * dispatch active event with new section
-   * index.
-   *
-   */
+   // position - get current users position. if user has scrolled to new section, dispatch active event with new section index.
   function position() {
     var pos = window.pageYOffset - 10 - containerStart;
     var sectionIndex = d3.bisect(sectionPositions, pos);
@@ -272,11 +137,7 @@ function scroller() {
   }
 
   /**
-   * container - get/set the parent element
-   * of the sections. Useful for if the
-   * scrolling doesn't start at the very top
-   * of the page.
-   *
+   * container - get/set the parent element of the sections. Useful for if the scrolling doesn't start at the very top of the page.
    * @param value - the new container value
    */
   scroll.container = function (value) {
@@ -329,6 +190,8 @@ function scroller() {
           <section class="step">18</section>
         </div>
         <div id="viz">
+          <text id="instructions"> Drag the slider to view different seasons </text>
+          <input id="slider" type="range" min="1998" max="2018" value="1998" style="width: 300px;" oninput="slider()">
           <h3 id="head">1997 - 1998 Season</h3>
           <svg id="zero" width='480' height='470'>
           </svg>
@@ -341,20 +204,20 @@ function scroller() {
       <p> 
 
 <b>1) Teams are shooting more threes (duh), and the rate at which teams are shooting more threes is increasing rapidly.</b><br><br>
-Most of the palpable change to shot selection in the NBA has occurred in just the past few years. The number of threes that the average team attempts per game has increased significantly more in the past five seasons (jumping from 20.0 to 29.0) than in the previous 15 (going from 12.7 to 20.0). Furthermore, two largest spikes in three point attempts in NBA history have taken place in the last two seasons (aside from when the league shortened the line in 1995). Fans of old-school, post-up basketball, watch out. If this current upward (and accelerating) trend continues, half of all shots in the NBA will be threes before 2030, and we know what that looks like thanks to the 2018 Houston Rockets. Aspects of that style of play are exciting (more room for isolation plays, bigger momentum swings, etc.), but it can also become a slog when the shots aren't falling (see 2018 Western Conference Finals Game 7). At what point will the league have to step in and make a rule change if jacking up threes becomes the staple of NBA offense?<br><br>
+Most of the change to shot selection in the NBA has occurred in just the past few years. The number of threes that the average team attempts per game has increased more in the past five seasons (jumping from 20.0 to 29.0) than in the previous 15 (going from 12.7 to 20.0). Furthermore, the last two seasons were the two largest spikes in three point attempts in NBA history (aside from when the league shortened the line in 1995). Fans of old-school, post-up basketball, watch out. If this current upward (and accelerating) trend continues, half of all shots in the NBA will be threes before 2030, and we know what that looks like thanks to the 2018 Houston Rockets. Aspects of that style of play are exciting (more room for isolation plays, bigger momentum swings, etc.), but it can also become a slog when the shots aren't falling (especially when 27 in a row don't fall). At what point will the league have to step in and make a rule change if the average NBA offense starts to look like a Mike D'Antoni pipe dream?<br><br>
 
-<b>2) Players aren't shooting threes more accurately, they're just shooting them more.</b><br><br>
-Drag the slider through the seasons and you'll see that the shooting accuracy at any particular spot on the court doesn't really change much over time — including behind the arc. Threes have been the most effective non-layup shot for 20 consecutive years, and league-wide percentage has only changed from 34.6% to 36.2% over that extended time period. Granted, teams are taking many more three point attempts, meaning that they're likely settling for deeper or more heavily contested three point shots than before, so the fact that players are still making them at the same rate suggests that they have indeed gotten better at shooting. Still, the change we've seen in recent years is more one of quantity than quality. Even teams that aren't improving their ability to shoot threes would probably still be better off shooting more of them. <br><br>
+<b>2) Players aren't shooting threes more accurately, they're just shooting more of them.</b><br><br>
+Scroll through the seasons and you'll see that shooting accuracy at any particular spot on the court hasn't really changed much over time — including behind the arc. Threes have been the most effective non-layup shot for 20 consecutive years, and league-wide percentage has only changed from 34.6% to 36.2% over those two decades. Granted, teams settle for deeper or more heavily contested three point shots than they used to, so the fact that players are still making them at the same rate suggests that they have indeed gotten better at shooting. Still, the change we've seen in shooting over recent years is more quantity than quality. Even teams that aren't improving their ability to shoot threes would probably still be better off bombing away. <br><br>
 
-<b>3) Corner threes are the best, and baseline mid-range shots are the worst.</b><br><br> 
+<b>3) Corner threes are the best, but mid-range baseline shots are the worst.</b><br><br> 
 
-The most surprising finding from this data for me was the sheer number of baseline two-pointers that teams were taking back in the 1990s. Seeing those baseline shots gradually scoot back behind the line over the past 20 years is the clearest example of the evolution of basketball. <br><br>
+Just look at the sheer number of baseline two-pointers that teams were taking back in the 1990s. Seeing those baseline shots gradually scoot back behind the line over the past 20 years is the clearest example of the evolution of basketball. <br><br>
 
 <b>4) Mid-range jumpers are dying out, and 4-to-8 footers could be the next to go.</b><br><br> 
 
-Shots right at the basket (either layups or dunks) have been, and likely always will be, the most effective shots in basketball — the area immediately surrounding the hoop is the dark green every single year — but shots that aren't quite layups absolutely suck. This makes intuitive sense. The only real reason to take a 5-footer is if you make a move to the basket but either a help defender steps into the paint or your defender catches up to you, preventing you from getting all the way to the rim. That is to say, there aren't many circumstances under which a player would shoot an uncontested shot from that short-range zone, and the numbers reflect this. With the exception of a few fluke seasons (2009-10 and 2016-17), the region just a few feet beyond from that elusive green territory at the basket has been consistently dark red. <br><br>
+Shots right at the basket (either layups or dunks) have been and always will be the most effective shots in basketball, but shots that aren't quite layups absolutely suck, which actually makes sense. The only real reason to take a 5-footer is if you make a move to the basket but either your defender catches up to you or a help defender steps in and you can't get all the way to the rim. That is to say, there aren't many circumstances under which a player would shoot an uncontested shot from that short-range zone, and the numbers reflect this. With the exception of a few fluke seasons (2009-10 and 2016-17), the region just a few feet beyond that green territory at the basket has been consistently dark red. <br><br>
 
-I bet the eradication of these shots is where we're headed next. Organizations have certainly gotten smarter over the past few years with regards to their shot selection. Well, most teams (I'm lookin' at you, Tom Thibodeau). Last season's league-wide shot chart is a far cry from the sea of red that is the 2003-04 shot chart, and the plethora of mid-range jumpers that led to those classic but largely unwatchable 71-67 battles in the early-2000s Eastern Conference playoffs are nearly gone from basketball. Analytics-oriented franchises will soon realize that those 4-to-8 footers are inefficient and will instruct players to change their games accordingly (i.e. kick the ball back out on literally any drive that you can't finish with a dunk). Even if teams don't go to that extreme, you can bet NBA offenses won't look the remotely same in 2028 as they did in 2018. <br><br> </p>
+I bet the eradication of these shots is where we're headed next. Organizations keep getting smarter with regards to their shot selection. The plethora of mid-range jumpers that led to those classic but basically unwatchable 71-67 battles in the early-2000s Eastern Conference playoffs are nearly gone from basketball. Analytics-oriented franchises will soon realize that those 4-to-8 footers are inefficient and tell players to change their games accordingly (i.e. kick the ball back out on literally any drive that you can't finish with a dunk). Even if teams don't go to that extreme, you can bet NBA offenses won't look the remotely same in 2028 as they did in 2018. <br><br> </p>
     </div>
 
   <script>
@@ -471,17 +334,47 @@ var colorScale = d3.scaleLinear()
   .range(["#e02900", "#ffcc00", "#72af01", "#0c9600"])
 
   function func(){
-    console.log(window.innerWidth);
-    if (window.innerWidth < 800){
-      end = 4170 + (800 - window.innerWidth);
+    console.log("here");
+    var w = window.innerWidth
+    if (w > 500){
+      document.getElementById('container').style.height = '4300px';
+      var scroll = scroller()
+        .container(d3.select('#graphic'));
+      // pass in .step selection as the steps
+      scroll(d3.selectAll('.step'));
+      // setup event handling
+      scroll.on('active', function (index) {
+        // activate current section
+        activate(index);
+      });
+      if (w > 800){
+        end = 4070;
+        console.log(end);
+      }
+      else {
+        end = 4180 + (800 - w);
+      }
     } else {
-      end = 4070;
+      document.getElementById('container').style.height = '1000px';
+      var scroll = scroller()
+        .container(d3.select('#graphic'));
+      // pass in .step selection as the steps
+      scroll(d3.selectAll('.step'));
+       scroll.on('active', function (index) {
+        console.log("here");
+      });
+      d3.select('#viz').attr("style", "position: absolute");
+      slide(document.getElementById('slider').value);
     }
   }
 
   var shiftScale = d3.scaleLinear()
   .domain([500, 359])
   .range([-100, -94])
+
+  function slider(){
+    slide(document.getElementById("slider").value);
+  }
 
 // iteratre through all elements of the 2D arrays, each value of which represents makes/attempts for a specific sqaure-foot of the court
 function slide(y){
@@ -572,6 +465,7 @@ function slide(y){
       } else if (i == 0 && sign == -1) {
         d3.select('#viz').attr("style", "position: absolute");
       } else if (i == 25 && sign == 1){
+        console.log(end);
         d3.select('#viz').attr("style", "position: absolute; top: " + end + "px;");
       } else if (i == 24 && sign == -1) {
         d3.select('#viz').attr("style", "position: fixed; top: 50px;");
@@ -580,16 +474,7 @@ function slide(y){
     lastIndex = activeIndex;
   };
 
-// setup scroll functionality
-  var scroll = scroller()
-    .container(d3.select('#graphic'));
-  // pass in .step selection as the steps
-  scroll(d3.selectAll('.step'));
-  // setup event handling
-  scroll.on('active', function (index) {
-    // activate current section
-    activate(index);
-  });
+func();
 
 
   </script>
