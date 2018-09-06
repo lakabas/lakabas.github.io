@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+
+<head>
+  <meta charset="utf-8">
+  <title>Lev Akabas</title>
+  <link rel="stylesheet" href="stylesheets/bootstrap.min.css">
+<style>
+
+body {
+  font-family: Arial;
+}
+
+nav {
+  position: relative;
+  display: block;
+  float: right;
+  padding-top: 30px;
+  padding-right: 50px;
+}
+h1 {
+  position: relative;
+  display: block;
+  float: left;
+  padding-left: 50px;
+  font-weight: normal;
+  text-decoration:none;
+}
+
+.navigation-link {
+  padding-left: 40px;
+  text-decoration: none;
+  color: #4A96AD;
+}
+.navigation-link:hover {
+  color: #7D1935;
+}
+.navigation {
+  background-color: #F5F3EE;
+  color: #4A96AD;
+  height: 80px;
+}
+h2{
+  text-align: center;
+  color: #7D1935;
+}
+h3 {
+  color: #7D1935;
+}
+.articles {
+  width: 90%;
+  margin: 0 auto;
+}
+.lev {
+  text-decoration:none;
+  color: #4A96AD;
+}
+.block {
+  width: 300px;
+  height: 200px;
+  background-color: #7D1935;
+  color: white;
+  margin: 0 auto;
+  text-align: center;
+  line-height: 200px;
+}
+a {
+  text-decoration: none;
+  color: #4A96AD;
+}
+a:hover {
+  color: white;
+}
+.viz {
+  font-size: 20px;
+  text-decoration: bold;
+  margin-top: 90px;
+  visibility: hidden;
+}
+.one {
+  background-image: url("viz1.png");
+  background-size: 300px 200px;
+}
+.two {
+  background-image: url("viz2.png");
+  background-size: 300px 200px;
+}
+.block:hover {
+  background-color: #7D1935;
+  background-image: none;
+  color: white;
+  text-align: center;
+}
+.visible {
+  visibility: visible;
+}
+
+@media only screen and (max-width: 800px) {
+  h1 {
+    text-align: center;
+    float: none;
+    padding-top: 20px;
+    padding-left: 0px;
+  }
+  nav {
+    text-align: center;
+    float: none;
+    padding-right: 15px;
+  }
+  .navigation-link {
+    padding-left: 15px;
+  }
+  .navigation {
+    height: 150px;
+  }
+}
+
+
+</style>
+</head>
+
+<script>
+ function func() {
+  document.getElementById("one").classList.add("visible");
+ }
+ function func2() {
+  document.getElementById("two").classList.add("visible");
+ }
+ function funct() {
+  document.getElementById("one").classList.remove("visible");
+ }
+ function funct2() {
+  document.getElementById("two").classList.remove("visible");
+ }
+</script>
+
+<body>
+  <div class="navigation">
+    <h1><a class="lev" href="https://levakabas.github.io">LEV AKABAS<a></h1>
+    <nav class="nav">
+    <a class="navigation-link" href="https://levakabas.github.io/viz.html">Data Visualizations</a>
+    <a class="navigation-link" href="https://levakabas.github.io/blogs.html">Blogs</a>
+    <a class="navigation-link" href="https://levakabas.github.io/clips.html">Journalism Clips</a>
+    </nav>
+  </div>
+<div class="articles">
+    <h2>Data Visualizations</h2>
+    <div class="block one" onmouseover="func()" onmouseout="funct()">
+      <a class="viz" id="one" href="/INFO3300Project1/project.html">NBA Shot Chart Evolution</a>
+    </div>
+    <br>
+    <div class="block two" onmouseover="func2()" onmouseout="funct2()">
+      <a class="viz" id="two" href="/INFO3300proj2/index.html">United States City Skylines</a>
+    </div>
+
+
+</body>
+</html>
