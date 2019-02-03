@@ -376,6 +376,8 @@ var colorScale = d3.scaleLinear()
     slide(document.getElementById("slider").value);
   }
 
+var isSmallShift = 15;
+
 // iteratre through all elements of the 2D arrays, each value of which represents makes/attempts for a specific sqaure-foot of the court
 function slide(y){
   svg0.selectAll("*").remove();
@@ -389,6 +391,7 @@ function slide(y){
   var style = "background-size: 700px 470px; background-position: -85px;";
 
   if (window.innerWidth < 539) {
+    isSmallShift = 0;
     w = window.innerWidth - 40;
     h = .94 * w;
     shift = shift * w / 500;
@@ -432,7 +435,7 @@ function slide(y){
       // append a circle to the SVG at the coordinates determined by the indeces of the array
       if (attempts2[year][i][j] > 20 && attempts2[year][i][j] < 300) {
           svg0.append('circle')
-        .attr('cx', i*shift-shift+15)
+        .attr('cx', i*shift-shift+isSmallShift)
         .attr('cy', h - (j*shift+shift))
         .attr('r', rScale(attempts2[year][i][j]+0.01))
         .attr('fill', color)
@@ -440,7 +443,7 @@ function slide(y){
       // for large outliers in number of attempts, manually set the radius to larger than those on the scale
       else if (attempts2[year][i][j] > 20) {
         svg0.append('circle')
-          .attr('cx', i*shift-shift+15)
+          .attr('cx', i*shift-shift+isSmallShift)
           .attr('cy', h - (j*shift+shift))
           .attr('r', maxradius + 1)
           .style('fill', color)
