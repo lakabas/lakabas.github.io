@@ -386,7 +386,7 @@ function slide(y){
   var shift = 10;
   var h = 470; 
   var maxradius = 8;
-  var style = "background-size: 700px 470px; background-position -100px;";
+  var style = "background-size: 700px 470px; background-position -90px;";
 
   if (window.innerWidth < 539) {
     w = window.innerWidth - 40;
@@ -432,7 +432,7 @@ function slide(y){
       // append a circle to the SVG at the coordinates determined by the indeces of the array
       if (attempts2[year][i][j] > 20 && attempts2[year][i][j] < 300) {
           svg0.append('circle')
-        .attr('cx', i*shift-shift)
+        .attr('cx', i*shift-shift+10)
         .attr('cy', h - (j*shift+shift))
         .attr('r', rScale(attempts2[year][i][j]+0.01))
         .attr('fill', color)
@@ -440,7 +440,7 @@ function slide(y){
       // for large outliers in number of attempts, manually set the radius to larger than those on the scale
       else if (attempts2[year][i][j] > 20) {
         svg0.append('circle')
-          .attr('cx', i*shift-shift)
+          .attr('cx', i*shift-shift+10)
           .attr('cy', h - (j*shift+shift))
           .attr('r', maxradius + 1)
           .style('fill', color)
