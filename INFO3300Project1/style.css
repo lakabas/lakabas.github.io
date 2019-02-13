@@ -1,5 +1,5 @@
 body{
-  background-color: white;
+  background-color: #263238;
   color: #263238;
   font-family: 'Oswald', sans-serif;
   text-align: center;
@@ -124,4 +124,7 @@ p {
   z-index: 1;
   height: 800px;  
   width: 100%;
+}
+.textp {
+  background-color: white;
 }
