@@ -1,0 +1,209 @@
+<html>
+<head>
+<title>NBA MVP Personalized Preference</title>
+<script src="https://d3js.org/d3.v4.min.js"> </script>
+<style>
+
+h1 {
+	text-align: center;
+}
+
+text {
+  font: bold 24px monospace;
+}
+
+.enter {
+  fill: green;
+}
+
+.update {
+  fill: #333;
+}
+
+.exit {
+  fill: brown;
+}
+
+#container {
+	height: 1000px;
+}
+
+#rankings {
+	width: 60%;
+	float: left;
+	display: inline-block;
+}
+
+#sliders {
+	background-color: yellow;
+	border: solid #ccc 3px;
+	display: inline-block;
+	float: right;
+	width: 30%;
+	text-align: center;
+}
+
+</style>
+</head>
+
+<body>
+<h1> Make Your Own Personalized MVP Ballot </h1>
+<div id="container">
+	<div id="rankings">
+		<svg width="800" height="500"></svg>
+	</div>
+
+	<div id="sliders">
+		<h3> How important are each of the following for an MVP candiate? </h3>
+		 <label>Statistical Profile: </label><br>
+         <input id="statprof" type="range" min="0" max="10" value="5">
+         <br>
+         <label>Advanced Box Score Metrics: </label><br>
+         <input id="boxscore" type="range" min="0" max="10" value="5">
+         <br>
+         <label>Plus Minus / Impact Metrics: </label><br>
+         <input id="plusminus" type="range" min="0" max="10" value="5">
+         <br>
+         <label>Usage Rate: </label><br>
+         <input id="usage" type="range" min="0" max="10" value="5">
+         <br>
+         <label>Clutch Scoring: </label><br>
+         <input id="clutch" type="range" min="0" max="10" value="5">
+         <br>
+         <label>Team Performance: </label><br>
+         <input id="team" type="range" min="0" max="10" value="5">
+         <br>
+         <label>Playing More Minutes and Not Missing Games: </label><br>
+         <input id="minutes" type="range" min="0" max="10" value="5">
+         <br>
+        <h3> Indicate your preferences</h3>
+         Defense <input id="offdef"" type="range" min="1" max="9" value="5"> Offense
+         <br>
+         Efficiency <input id="voleff" type="range" min="1" max="9" value="5"> Scoring Volume
+         <br>
+         <br>
+         <button onclick="calculate()"> Recalculate </button>
+
+	</div>
+
+</div>
+
+</body>
+</html>
+
+
+<script>
+
+var rawData;
+
+var svg = d3.select("svg"),
+    width = +svg.attr("width"),
+    height = +svg.attr("height"),
+    g = svg.append("g").attr("transform", "translate(" + (width / 2) + ",32)");
+
+function mutateRow(row) {
+  row["Pts"] = Number(row["Pts"]);
+  row["Wins"] = Number(row["Wins"]);
+  row["ClutchTS"] = Number(row["ClutchTS"]);
+  row["ClutchPts"] = Number(row["ClutchPts"]);
+  row["OPIPM"] = Number(row["OPIPM"]);
+  row["DPIPM"] = Number(row["DPIPM"]);
+  row["OffRtg"] = Number(row["OffRtg"]);
+  row["DefRtg"] = Number(row["DefRtg"]);
+  row["TS%"] = Number(row["TS%"]);
+  row["PER"] = Number(row["PER"]);
+  row["ORB%"] = Number(row["ORB%"]);
+  row["DRB%"] = Number(row["DRB%"]);
+  row["AST%"] = Number(row["AST%"]);
+  row["STL%"] = Number(row["STL%"]);
+  row["BLK%"] = Number(row["BLK%"]);
+  row["USG%"] = Number(row["USG%"]);
+  row["OWS"] = Number(row["OWS"]);
+  row["DWS"] = Number(row["DWS"]);
+  row["OBPM"] = Number(row["OBPM"]);
+  row["DBPM"] = Number(row["DBPM"]);
+  row["ORPM"] = Number(row["ORPM"]);
+  row["DRPM"] = Number(row["DRPM"]);
+  row["VORP"] = Number(row["VORP"]);
+  row["MP"] = Number(row["MP"]);
+
+  row["Score"] = 0;
+  return row;
+}
+
+function update(data){
+
+  var t = d3.transition().duration(5000);
+
+  // JOIN new data with old elements.
+  var text = g.selectAll("text").data(data, function(d) { return d["Player"]; });
+
+  // EXIT old elements not present in new data.
+  text.exit()
+      .attr("class", "exit")
+      .transition(t)
+      .attr("x", 200)
+      .style("fill-opacity", 1e-6)
+      .remove();
+
+  // UPDATE old elements present in new data.
+  text.attr("class", "update")
+      .attr("x", 0)
+      .style("fill-opacity", 1)
+      .transition(t)
+      .attr("y", function(d, i) { return i * 32; });
+
+  // ENTER new elements present in new data.
+  text.enter().append("text")
+      .attr("class", "enter")
+      .attr("dy", ".35em")
+      .attr("x", -200)
+      .attr("y", function(d, i) { return i * 32; })
+      .style("fill-opacity", 1e-6)
+      .text(function(d) { return d["Player"]; })
+      .transition(t)
+      .attr("x", 0)
+      .style("fill-opacity", 1);
+}
+
+function calculate(){
+  var data = rawData
+  var statprof = document.getElementById("statprof").value
+  var boxscore = document.getElementById("boxscore").value
+  var plusminus = document.getElementById("plusminus").value
+  var usage = document.getElementById("usage").value
+  var clutch = document.getElementById("clutch").value
+  var team = document.getElementById("team").value
+  var minutes = document.getElementById("minutes").value / 10
+  var offdef = document.getElementById("offdef").value / 10
+  var voleff = document.getElementById("voleff").value / 10
+  for (p in data){
+  	var SP = offdef * (.4 * (voleff * data[p]["Pts"] + (1 - voleff) * data[p]["TS%"]) + .4 * data[p]["AST%"] + .2 * data[p]["ORB%"]) +
+  		     (1 - offdef) * (.2 * data[p]["DRB%"] + .4 * data[p]["STL%"] + .4 * data[p]["BLK%"])
+  	var BS = .25 * data[p]["PER"] + 
+  			 .25 * data[p]["VORP"] + 
+  			 .25 * (offdef * data[p]["OBPM"] + (1 - offdef) * data[p]["DBPM"]) +
+  			 .25 * (offdef * data[p]["OWS"] + (1 - offdef) * data[p]["DWS"])
+  	var PM = .5 * (offdef * data[p]["ORPM"] + (1 - offdef) * data[p]["DRPM"]) +
+  			 .5 * (offdef * data[p]["OPIPM"] + (1 - offdef) * data[p]["DPIPM"])
+  	var U = data[p]["USG%"]
+  	var C = voleff * (data[p]["ClutchPts"]) + (1 - voleff) * data[p]["ClutchTS"]
+  	var T = .5 * data[p]["Wins"] + .5 * (offdef * data[p]["OffRtg"] + (1 - offdef) * data[p]["DefRtg"])
+  	var score = (data[p]["MP"] + (1 - minutes) * (1 - data[p]["MP"])) * 
+  	  			(statprof * SP + boxscore * BS + plusminus * PM + usage * U + clutch * C + team * T)
+
+  	data[p]["Score"] = score
+  }
+
+  var sorted = data.sort( function(a, b){return b["Score"] - a["Score"]} );
+  var top10 = sorted.slice(0,10)
+
+  update(top10);
+ }
+
+ d3.csv("scales.csv", mutateRow, function (error, data) {
+	rawData = data
+	calculate();
+ });
+
+</script>
