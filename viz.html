@@ -82,6 +82,10 @@ a {
   background-image: url("viz2.png");
   background-size: 300px 200px;
 }
+.two {
+  background-image: url("Viz3/mvp.jpg");
+  background-size: 300px 200px;
+}
 .block:hover {
   background-color: #7D1935;
   background-image: none;
@@ -126,11 +130,17 @@ a {
  function func2() {
   document.getElementById("two").classList.add("visible");
  }
+  function func3() {
+  document.getElementById("three").classList.add("visible");
+ }
  function funct() {
   document.getElementById("one").classList.remove("visible");
  }
  function funct2() {
   document.getElementById("two").classList.remove("visible");
+ }
+ function funct3() {
+  document.getElementById("three").classList.remove("visible");
  }
 </script>
 
@@ -151,6 +161,10 @@ a {
     <br>
     <div class="block two" onmouseover="func2()" onmouseout="funct2()">
       <a class="viz" id="two" href="/INFO3300proj2/index.html">United States City Skylines</a>
+    </div>
+    <br>
+    <div class="block three" onmouseover="func3()" onmouseout="funct3()">
+      <a class="viz" id="three" href="/Viz3/statsslider.html">Personalized MVP Ballot</a>
     </div>
 
 
