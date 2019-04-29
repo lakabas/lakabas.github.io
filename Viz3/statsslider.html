@@ -161,11 +161,6 @@ p {
 	</p>
 </div>
 
-<div>
-<h1> Harden and Giannis Are Outliers </h1>
-<svg width="750" height="600" id="graph"></svg>
-</div>
-
 </body>
 </html>
 
@@ -179,8 +174,6 @@ var svg = d3.select("#rank"),
     width = +svg.attr("width"),
     height = +svg.attr("height"),
     g = svg.append("g").attr("transform", "translate(" + (width / 3) + ",32)");
-
-var svg2 = d3.select("#graph")
 
 function mutateRow(row) {
   row["Pts"] = Number(row["Pts"]);
@@ -323,66 +316,5 @@ function calculate(){
  });
 
 
-
- function mutateRow2(row) {
-  row["UnDunks"] = Number(row["UnDunks"]);
-  row["Un3s"] = Number(row["Un3s"]);
-  row["Old"] = Number(row["Old"]);
-  return row;
-}
-
- d3.csv("dunksnthrees.csv", mutateRow2, function (error, data) {
-	rawData2 = data;
-	console.log(rawData2);
- 
-  var dunkExtent = d3.max(rawData2, function (d) { return d["UnDunks"]; });
-  
-  dunkScale = d3.scaleLinear()
-  .domain([0,dunkExtent+10])
-  .range([570, 30]);
-  
-  var threesExtent = d3.max(rawData2, function (d) { return d["Un3s"]; });
-  
-  threesScale = d3.scaleLinear()
-  .domain([0,threesExtent+10])
-  .range([30, 570]);
-
-  var dunkAxis = d3.axisLeft(dunkScale);
-  svg2.append("g")
-  .attr("transform", "translate(30, 0)")
-  .call(dunkAxis);
-
-  var threesAxis = d3.axisBottom(threesScale);
-  svg2.append("g")
-  .attr("transform", "translate(0, 570)")
-  .call(threesAxis);
-
-	svg2.append("text")
-	.attr("id", "PlayerName")
-	.attr("x", 250)
-	.attr("y", 50)
-	.style("font-size", "12pt");
-
-  rawData2.forEach(function (d) {
-  	var color = "blue";
-  	if (d["Old"] == 1) {
-  		color = "grey"
-  	}
-    svg2.append("circle")
-    .attr("cx", threesScale(d["Un3s"]))
-    .attr("cy", dunkScale(d["UnDunks"]))
-    .attr("r", 5)
-    .style("opacity", 1)
-    .style("fill", color)
-    .on("mouseover", function () {
-      svg2.select("#PlayerName").text(d["Player"]);
-    });
-  });
-
-
- });
-
-
-  
 
 </script>
