@@ -6,41 +6,104 @@
 
 h1 {
 	text-align: center;
+	font: bold 36px sans-serif; 
 }
 
+body {
+	font-family: sans-serif;
+}
+
+button {
+	font-size: 20px;
+	border: solid black 2px;
+	border-radius: 6px;
+}
+
+input[type="range"] {
+  -webkit-appearance: none;
+  background-color: #2c538c;
+  width: 200px;
+  height: 7px;
+  border-radius: 5px;
+  margin: 0 0 8 0;
+  outline: 0;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  background: url(bball.jpg);
+  background-size: 27.2px 20.3px;
+  background-position: -3.6px 0px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: .3s ease-in-out;
+}​
+
 text {
-  font: bold 24px monospace;
+	font-family: sans-serif;
+}
+
+p {
+	font-size: 12px;
 }
 
 .enter {
   fill: green;
+  font: bold 24px sans-serif;
 }
 
 .update {
   fill: #333;
+  font: bold 24px sans-serif;
 }
 
 .exit {
   fill: brown;
+  font: bold 24px sans-serif;
+}
+
+.enterr {
+  stroke: green;
+  stroke-width: 3px;
+  fill: #a9c5f2;
+}
+
+.updater {
+  stroke: #333;
+  stroke-width: 3px;
+  fill: #a9c5f2;
+}
+
+.exitr {
+  stroke: brown;
+  stroke-width: 3px;
+  fill: #a9c5f2;
 }
 
 #container {
-	height: 1000px;
+	height: 530px;
 }
 
 #rankings {
-	width: 60%;
+	width: 65%;
 	float: left;
+	height: 520px;
 	display: inline-block;
+	border: solid black 3px;
+	background-image: url("mvp.jpg");
+	background-size: 1200px 750px;
+	background-position: -200px 0px;
 }
 
 #sliders {
-	background-color: yellow;
-	border: solid #ccc 3px;
+	background-color: #a9c5f2;
+	border: solid black 3px;
 	display: inline-block;
 	float: right;
-	width: 30%;
+	width: 33%;
 	text-align: center;
+	height: 520px;
 }
 
 </style>
@@ -50,7 +113,7 @@ text {
 <h1> Make Your Own Personalized MVP Ballot </h1>
 <div id="container">
 	<div id="rankings">
-		<svg width="800" height="500"></svg>
+		<svg width="750" height="520" id="rank"></svg>
 	</div>
 
 	<div id="sliders">
@@ -82,10 +145,25 @@ text {
          Efficiency <input id="voleff" type="range" min="1" max="9" value="5"> Scoring Volume
          <br>
          <br>
-         <button onclick="calculate()"> Recalculate </button>
+         <button onclick="calculate()"> Calculate My Ballot </button>
 
 	</div>
+</div>
 
+<div>
+	<p>
+	* Statistical Profile encompasses traditional box score stats such as points, shooting percentage, assists, rebounds, blocks, and steals <br>
+	* Advanced Box Score Metrics includes VORP (Value Over Replacement Player), BPM (Box Plus-Minus), and WS (Win Shares), which are catch-all statistics generated using traditional box score stats <br>
+	* Plus Minus / Impact Metrics includes RPM (Real Plus-Minus) and PIPM (Player Impact Plus-Minus), both of which attempt to estimate a player's impact on their team using plus-minus data <br>
+	* Usage Rate is an estimate of the percentage of the team's offense possessions that a player uses <br>
+	* Clutch Scoring encompasses both scoring volume and efficiency in the last five minutes of games when the score is within five points <br>
+	* Team Performance includes team record and the team's net rating with a given player on the court <br>
+	</p>
+</div>
+
+<div>
+<h1> Harden and Giannis Are Outliers </h1>
+<svg width="750" height="600" id="graph"></svg>
 </div>
 
 </body>
@@ -95,11 +173,14 @@ text {
 <script>
 
 var rawData;
+var rawData2;
 
-var svg = d3.select("svg"),
+var svg = d3.select("#rank"),
     width = +svg.attr("width"),
     height = +svg.attr("height"),
-    g = svg.append("g").attr("transform", "translate(" + (width / 2) + ",32)");
+    g = svg.append("g").attr("transform", "translate(" + (width / 3) + ",32)");
+
+var svg2 = d3.select("#graph")
 
 function mutateRow(row) {
   row["Pts"] = Number(row["Pts"]);
@@ -137,9 +218,18 @@ function update(data){
 
   // JOIN new data with old elements.
   var text = g.selectAll("text").data(data, function(d) { return d["Player"]; });
+  var rectangle = g.selectAll("rect").data(data, function(d) { return d["Player"]; });
 
   // EXIT old elements not present in new data.
-  text.exit()
+  rectangle.exit()
+      .attr("class", "exitr")
+      .transition(t)
+      .attr("x", 200)
+      .style("fill-opacity", 1e-6)
+      .style("stroke-opacity", 1e-6)
+      .remove();
+
+   text.exit()
       .attr("class", "exit")
       .transition(t)
       .attr("x", 200)
@@ -147,23 +237,49 @@ function update(data){
       .remove();
 
   // UPDATE old elements present in new data.
-  text.attr("class", "update")
+    rectangle.attr("class", "updater")
+      .attr("x", -50)
+      .style("fill-opacity", 1)
+      .transition(t)
+      .attr("y", function(d, i) { return i * 50 - 20; })
+
+    text.attr("class", "update")
       .attr("x", 0)
       .style("fill-opacity", 1)
       .transition(t)
-      .attr("y", function(d, i) { return i * 32; });
+      .attr("y", function(d, i) { return i * 50; })
+      .text(function(d, i) { return (i + 1) + ". " + d["Player"]; });
 
   // ENTER new elements present in new data.
+  rectangle.enter().append("rect")
+      .attr("class", "enterr")
+      .attr("x", -200)
+      .attr("y", function(d, i) { return i * 50 - 20; })
+      .attr("width", 400)
+      .attr("height", 40)
+      .style("fill-opacity", 1e-6)
+      .style("stroke-opacity", 1e-6)
+      .transition(t)
+      .attr("x", -50)
+      .style("fill-opacity", 1) 
+      .style("stroke-opacity", 1)
+      .transition(t)
+      .attr("class", "updater");
+
   text.enter().append("text")
       .attr("class", "enter")
       .attr("dy", ".35em")
       .attr("x", -200)
-      .attr("y", function(d, i) { return i * 32; })
+      .attr("y", function(d, i) { return i * 50; })
       .style("fill-opacity", 1e-6)
-      .text(function(d) { return d["Player"]; })
+      .text(function(d, i) { return (i + 1) + ". " + d["Player"]; })
       .transition(t)
       .attr("x", 0)
-      .style("fill-opacity", 1);
+      .style("fill-opacity", 1)
+      .transition(t)
+      .attr("class", "update");
+
+    
 }
 
 function calculate(){
@@ -178,21 +294,22 @@ function calculate(){
   var offdef = document.getElementById("offdef").value / 10
   var voleff = document.getElementById("voleff").value / 10
   for (p in data){
-  	var SP = offdef * (.4 * (voleff * data[p]["Pts"] + (1 - voleff) * data[p]["TS%"]) + .4 * data[p]["AST%"] + .2 * data[p]["ORB%"]) +
-  		     (1 - offdef) * (.2 * data[p]["DRB%"] + .4 * data[p]["STL%"] + .4 * data[p]["BLK%"])
-  	var BS = .25 * data[p]["PER"] + 
-  			 .25 * data[p]["VORP"] + 
-  			 .25 * (offdef * data[p]["OBPM"] + (1 - offdef) * data[p]["DBPM"]) +
-  			 .25 * (offdef * data[p]["OWS"] + (1 - offdef) * data[p]["DWS"])
+  	var SP = offdef * (.66 * (voleff * data[p]["Pts"] + (1 - voleff) * data[p]["TS%"]) + .33 * data[p]["AST%"] + .16 * data[p]["ORB%"]) +
+  		     (1 - offdef) * (.16 * data[p]["DRB%"] + .33 * data[p]["STL%"] + .33 * data[p]["BLK%"])
+  	var BS = .333 * data[p]["VORP"] * Math.min(2 * offdef,2-2*offdef)
+  			 .333 * (offdef * data[p]["OBPM"] + (1 - offdef) * data[p]["DBPM"]) +
+  			 .333 * (offdef * data[p]["OWS"] + (1 - offdef) * data[p]["DWS"])
   	var PM = .5 * (offdef * data[p]["ORPM"] + (1 - offdef) * data[p]["DRPM"]) +
   			 .5 * (offdef * data[p]["OPIPM"] + (1 - offdef) * data[p]["DPIPM"])
-  	var U = data[p]["USG%"]
-  	var C = voleff * (data[p]["ClutchPts"]) + (1 - voleff) * data[p]["ClutchTS"]
+  	var U = data[p]["USG%"] * Math.min(1,offdef * 2)
+  	var C = (voleff * (data[p]["ClutchPts"]) + (1 - voleff) * data[p]["ClutchTS"]) * Math.min(1,offdef * 2)
   	var T = .5 * data[p]["Wins"] + .5 * (offdef * data[p]["OffRtg"] + (1 - offdef) * data[p]["DefRtg"])
   	var score = (data[p]["MP"] + (1 - minutes) * (1 - data[p]["MP"])) * 
   	  			(statprof * SP + boxscore * BS + plusminus * PM + usage * U + clutch * C + team * T)
 
   	data[p]["Score"] = score
+  	console.log(data[p]["Player"]);
+  	console.log(SP)
   }
 
   var sorted = data.sort( function(a, b){return b["Score"] - a["Score"]} );
@@ -202,8 +319,70 @@ function calculate(){
  }
 
  d3.csv("scales.csv", mutateRow, function (error, data) {
-	rawData = data
-	calculate();
+	rawData = data;
  });
+
+
+
+ function mutateRow2(row) {
+  row["UnDunks"] = Number(row["UnDunks"]);
+  row["Un3s"] = Number(row["Un3s"]);
+  row["Old"] = Number(row["Old"]);
+  return row;
+}
+
+ d3.csv("dunksnthrees.csv", mutateRow2, function (error, data) {
+	rawData2 = data;
+	console.log(rawData2);
+ 
+  var dunkExtent = d3.max(rawData2, function (d) { return d["UnDunks"]; });
+  
+  dunkScale = d3.scaleLinear()
+  .domain([0,dunkExtent+10])
+  .range([570, 30]);
+  
+  var threesExtent = d3.max(rawData2, function (d) { return d["Un3s"]; });
+  
+  threesScale = d3.scaleLinear()
+  .domain([0,threesExtent+10])
+  .range([30, 570]);
+
+  var dunkAxis = d3.axisLeft(dunkScale);
+  svg2.append("g")
+  .attr("transform", "translate(30, 0)")
+  .call(dunkAxis);
+
+  var threesAxis = d3.axisBottom(threesScale);
+  svg2.append("g")
+  .attr("transform", "translate(0, 570)")
+  .call(threesAxis);
+
+	svg2.append("text")
+	.attr("id", "PlayerName")
+	.attr("x", 250)
+	.attr("y", 50)
+	.style("font-size", "12pt");
+
+  rawData2.forEach(function (d) {
+  	var color = "blue";
+  	if (d["Old"] == 1) {
+  		color = "grey"
+  	}
+    svg2.append("circle")
+    .attr("cx", threesScale(d["Un3s"]))
+    .attr("cy", dunkScale(d["UnDunks"]))
+    .attr("r", 5)
+    .style("opacity", 1)
+    .style("fill", color)
+    .on("mouseover", function () {
+      svg2.select("#PlayerName").text(d["Player"]);
+    });
+  });
+
+
+ });
+
+
+  
 
 </script>
