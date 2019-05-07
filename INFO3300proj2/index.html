@@ -477,7 +477,7 @@ function show(){
     .call(d3.axisLeft(yScale).ticks(10).tickFormat(function(d){
                                                       return d+' ft';
                                                    }));
-    svg.append("text").attr("transform", "rotate(270) translate(-170, 5)").text("Height");
+    //svg.append("text").attr("transform", "rotate(270) translate(-170, 5)").text("Height");
     i = 1880;    
     svg.append("text").attr("transform", "translate(" + (padding+width/2) + "," + 2*padding+")").text(""+i)
     .style("font-size", "150px")
@@ -493,7 +493,7 @@ function show(){
     .call(d3.axisLeft(yScale).ticks(10).tickFormat(function(d){
                                                       return d+' ft';
                                                    }));
-    svg2.append("text").attr("transform", "rotate(270) translate(-170, 5)").text("Height");
+    //svg2.append("text").attr("transform", "rotate(270) translate(-170, 5)").text("Height");
     i = 1880;    
     svg2.append("text").attr("transform", "translate(" + (padding+width/2) + "," + 2*padding+")").text(""+i)
     .style("font-size", "150px")
