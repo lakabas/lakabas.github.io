@@ -82,12 +82,13 @@ p {
 }
 
 #container {
-	height: 530px;
+	width: 100%;
+	display: inline-block;
+	text-align: center;
 }
 
 #rankings {
-	width: 65%;
-	float: left;
+	width: 750px;
 	height: 520px;
 	display: inline-block;
 	border: solid black 3px;
@@ -100,21 +101,55 @@ p {
 	background-color: #a9c5f2;
 	border: solid black 3px;
 	display: inline-block;
-	float: right;
-	width: 33%;
+	vertical-align: top;
+	margin-right: 10px;
+	margin-bottom: 10px;
+	width: 400px;
 	text-align: center;
 	height: 520px;
+}
+
+#graphdiv {
+	display: inline-block;
+	margin-left: 40px;
+    width: 600px;
+}
+
+#old {
+	display: block;
+    margin: auto;
+}
+
+#second {
+	background-color: #e1e9f7;
+	border: solid black 3px;
+}
+
+#container2 {
+	display: inline-block;
+	text-align: center;
+}
+
+#explain {
+	display: inline-block;
+	width: 260px;
+	margin-left: 10px;
+}
+
+#playerName {
+	font-weight: bold;
+}
+
+#glossary {
+	text-align: center;
 }
 
 </style>
 </head>
 
-<body>
+<body onresize="func()">
 <h1> Make Your Own Personalized MVP Ballot </h1>
 <div id="container">
-	<div id="rankings">
-		<svg width="750" height="520" id="rank"></svg>
-	</div>
 
 	<div id="sliders">
 		<h3> How important are each of the following for an MVP candiate? </h3>
@@ -146,11 +181,15 @@ p {
          <br>
          <br>
          <button onclick="calculate()"> Calculate My Ballot </button>
-
 	</div>
+
+	<div id="rankings">
+		<svg width="750" height="520" id="rank"></svg>
+	</div>
+
 </div>
 
-<div>
+<div id="glossary">
 	<p>
 	* Statistical Profile encompasses traditional box score stats such as points, shooting percentage, assists, rebounds, blocks, and steals <br>
 	* Advanced Box Score Metrics includes VORP (Value Over Replacement Player), BPM (Box Plus-Minus), and WS (Win Shares), which are catch-all statistics generated using traditional box score stats <br>
@@ -161,6 +200,50 @@ p {
 	</p>
 </div>
 
+<div id="second">
+<h1> Harden and Giannis Are Outliers Among Outliers</h1>
+<div id="container2">
+    <div id="explain"> 
+    	<p> Included in the chart are all players from this season who finished in the Top 80 in both RPM Wins and VORP, finished in the Top 40 in one of those two stats, and played more than 29 minutes per game. That gave me a nice round number of 40 players that covered all legitimate MVP candidates as well as a few interesting oddballs (hello, Thaddeus Young). "Old MVP Candidates" includes all seasons since 2000-01 that finished in the top two in MVP voting or received at least five first place votes. </p>
+    	<br><br>
+    	<svg id="key3" width="250" height="150">
+	      <defs>
+	        <linearGradient id="efficiency">
+	          <stop class="stop1" offset="0%"/>
+	          <stop class="stop2" offset="25%"/>
+	          <stop class="stop3" offset="50%"/>
+	          <stop class="stop4" offset="75%"/>
+	          <stop class="stop5" offset="100%"
+	        </linearGradient>
+	        <style type="text/css"><![CDATA[
+	          #rect1 { fill: url(#efficiency); }
+	          .stop1 { stop-color: #a9c5f2; }
+	          .stop2 { stop-color: #1b7aba; }
+	          .stop3 { stop-color: #125887; }
+	          .stop4 { stop-color: #082b42}
+	          .stop4 { stop-color: #000000}
+	        ]]></style>
+	       </defs>
+	      <text x="125" y="20" alignment-baseline="middle" text-anchor="middle"> Percent of Field Goals Assisted </text>
+	      <rect id="rect1" x="25" y="30" rx="15" ry="15" width="200" height="40"/>
+	      <text x="25" y="90" alignment-baseline="middle" text-anchor="middle"> 13% </text>
+	      <text x="125" y="90" alignment-baseline="middle" text-anchor="middle"> 48% </text>
+	      <text x="225" y="90" alignment-baseline="middle" text-anchor="middle"> 83% </text>
+	    </svg>
+	    <svg id="key4" width ="250" height="190">
+	      <text x="125" y="20" alignment-baseline="middle" text-anchor="middle"> Points Per Game </text>
+	      <text x="25" y="90" alignment-baseline="middle" text-anchor="middle"> 12 </text>
+	      <text x="125" y="90" alignment-baseline="middle" text-anchor="middle"> 24 </text>
+	      <text x="225" y="90" alignment-baseline="middle" text-anchor="middle"> 36 </text>
+	    </svg>
+    </div>
+    <div id="graphdiv">
+    	<button id="old" onclick="toggle()">Show Previous MVP Candidates</button>
+		<svg width="650" height="600" id="graph"></svg>
+	</div>
+</div>
+</div>
+
 </body>
 </html>
 
@@ -169,11 +252,54 @@ p {
 
 var rawData;
 var rawData2;
+var axisLength = 500;
+var old = false;
+var graphed = false;
+var enterExit = 200;
 
 var svg = d3.select("#rank"),
     width = +svg.attr("width"),
     height = +svg.attr("height"),
     g = svg.append("g").attr("transform", "translate(" + (width / 3) + ",32)");
+
+var svg2 = d3.select("#graph")
+
+function func(){
+	if (window.innerWidth > 915) {
+		document.getElementById("graphdiv").style.marginLeft = 40;
+	} else {
+		document.getElementById("graphdiv").style.marginLeft = 10;
+	}
+	if (window.innerWidth < 660) {
+		w = window.innerWidth - 50;
+		console.log(w);
+		document.getElementById("graph").style.width = w;
+		document.getElementById("graphdiv").style.width = w;
+		document.getElementById("graphdiv").style.marginLeft = 10;
+		axisLength = w - 80;
+		graphed = false;
+		graphit();
+
+		document.getElementById("rank").style.width = 400;
+		document.getElementById("rankings").style.width = 400;
+		enterExit = 0;
+		calculate();
+
+	} else if (axisLength != 500){
+		document.getElementById("graph").style.width = 650;
+		document.getElementById("graphdiv").style.width = 600;
+		document.getElementById("graphdiv").style.marginLeft = 40;
+		axisLength = 500;
+		graphed = false;
+		graphit();
+
+		document.getElementById("rank").style.width = 750;
+		document.getElementById("rankings").style.width = 750;
+		enterExit = 200;
+		calculate();
+	}
+	
+}
 
 function mutateRow(row) {
   row["Pts"] = Number(row["Pts"]);
@@ -231,13 +357,13 @@ function update(data){
 
   // UPDATE old elements present in new data.
     rectangle.attr("class", "updater")
-      .attr("x", -50)
+      .attr("x", -250 + enterExit)
       .style("fill-opacity", 1)
       .transition(t)
       .attr("y", function(d, i) { return i * 50 - 20; })
 
     text.attr("class", "update")
-      .attr("x", 0)
+      .attr("x", -200 + enterExit)
       .style("fill-opacity", 1)
       .transition(t)
       .attr("y", function(d, i) { return i * 50; })
@@ -246,14 +372,14 @@ function update(data){
   // ENTER new elements present in new data.
   rectangle.enter().append("rect")
       .attr("class", "enterr")
-      .attr("x", -200)
+      .attr("x", -400 + enterExit)
       .attr("y", function(d, i) { return i * 50 - 20; })
       .attr("width", 400)
       .attr("height", 40)
       .style("fill-opacity", 1e-6)
       .style("stroke-opacity", 1e-6)
       .transition(t)
-      .attr("x", -50)
+      .attr("x", -250 + enterExit)
       .style("fill-opacity", 1) 
       .style("stroke-opacity", 1)
       .transition(t)
@@ -262,12 +388,12 @@ function update(data){
   text.enter().append("text")
       .attr("class", "enter")
       .attr("dy", ".35em")
-      .attr("x", -200)
+      .attr("x", -400 + enterExit)
       .attr("y", function(d, i) { return i * 50; })
       .style("fill-opacity", 1e-6)
       .text(function(d, i) { return (i + 1) + ". " + d["Player"]; })
       .transition(t)
-      .attr("x", 0)
+      .attr("x", -200 + enterExit)
       .style("fill-opacity", 1)
       .transition(t)
       .attr("class", "update");
@@ -316,5 +442,202 @@ function calculate(){
  });
 
 
+
+ function mutateRow2(row) {
+  row["UnDunks"] = Number(row["UnDunks"]);
+  row["Un3s"] = Number(row["Un3s"]);
+  row["Old"] = Number(row["Old"]);
+  row["Pts"] = Number(row["Pts"]);
+  row["Unast"] = Number(row["Unast"]);
+  return row;
+}
+
+function toggle(){
+	if (old == false){
+		old = true;
+		document.getElementById("old").innerHTML = "Hide Old MVP Candidates"
+	} else {
+		old = false;
+		document.getElementById("old").innerHTML = "Show Old MVP Candidates"
+	}
+	graphit();
+}
+
+function axes(dunkScale,threesScale,ptsScale){
+	svg2.selectAll("*").remove();
+	  var dunkAxis = d3.axisLeft(dunkScale);
+	  svg2.append("g")
+	  .attr("transform", "translate(80, 0)")
+	  .call(dunkAxis);
+
+	  var threesAxis = d3.axisBottom(threesScale);
+	  svg2.append("g")
+	  .attr("transform", "translate(0, " + axisLength + ")")
+	  .call(threesAxis);
+
+	  svg2.append("text").attr("transform", "rotate(270) translate(-" + (axisLength * 325 / 500) + ", 30)").text("Unassisted Dunks");
+	  svg2.append("text").attr("transform", "translate(" + axisLength / 2 + ", " + (axisLength + 50) + ")").text("Unassisted Threes");
+
+	  var svg = d3.select("#key4");
+      for (var i = 1; i < 8; i++){
+        svg.append('circle')
+        .attr('cx', -8.33333 + (33.3333 * i))
+        .attr('cy', 50)
+        .attr('r', ptsScale(8 + 4 * i))
+        .attr('fill', "black");
+      }
+}
+
+function graphit(){
+	svg2.selectAll("circle").remove();
+	svg2.selectAll(".label").remove();
+
+	 d3.csv("dunksnthrees.csv", mutateRow2, function (error, data) {
+		rawData2 = data;
+	 
+	  var dunkExtent = d3.max(rawData2, function (d) { return d["UnDunks"]; });
+	  
+	  dunkScale = d3.scaleLinear()
+	  .domain([0,dunkExtent+10])
+	  .range([axisLength, 30]);
+	  
+	  var threesExtent = d3.max(rawData2, function (d) { return d["Un3s"]; });
+	  
+	  threesScale = d3.scaleLinear()
+	  .domain([0,threesExtent+10])
+	  .range([80, axisLength+50]);
+
+	  var ptsExtent = d3.extent(rawData2, function (d) { return d["Pts"]; });
+
+	  ptsScale = d3.scaleSqrt()
+	  .domain([12.1,36.1])
+	  .range([2,10]);
+
+	  if (!graphed){
+	  	axes(dunkScale,threesScale,ptsScale);
+	  	graphed = true;
+	  }
+
+	  var colorMax = d3.max(rawData2, function (d) { return d["Unast"]; });
+	  var colorMin = d3.min(rawData2, function (d) { return d["Unast"]; });
+	  var colorHalf = (colorMax - colorMin)/2 + colorMin
+
+	  colorScale = d3.scaleLinear()
+	  .domain([colorMax,colorMax - (colorHalf-colorMin)/2,colorHalf,(colorMax - colorHalf)/2 + colorMin,colorMin])
+	  .range(["#a9c5f2","#1b7aba","#125887","#082b42","#000000"]);
+
+	  svg2.append("text")
+		.attr("id", "PlayerName")
+		.attr("x", axisLength * 275/500)
+		.attr("y", axisLength * 250/500)
+		.style("font-size", (axisLength * 20/500) + "pt");
+
+	  rawData2.forEach(function (d) {
+	  	if (d["Old"] == 0 || old == true){
+		    svg2.append("circle")
+		    .attr("cx", threesScale(d["Un3s"]))
+		    .attr("cy", dunkScale(d["UnDunks"]))
+		    .attr("r", ptsScale(d["Pts"]))
+		    .style("opacity", 1) // - d["Old"] * .5)
+		    .style("fill", colorScale(d["Unast"]))
+		    .on("mouseover", function () {
+		      svg2.select("#PlayerName").text(d["Player"]);
+		    })
+		    .on("mouseout", function () {
+		      svg2.select("#PlayerName").text("");
+		    });
+
+		    if (d["Player"] == "James Harden"){
+			    svg2.append("text")
+			    .attr("x",threesScale(d["Un3s"]) - 30)
+			    .attr("y", dunkScale(d["UnDunks"]) - 12)
+			    .text(d["Player"])
+			    .attr("class","label")
+			    .style("font-size", "7pt");
+			}
+			if (d["Player"] == "Giannis Antetokounmpo"){
+			    svg2.append("text")
+			    .attr("x",threesScale(d["Un3s"]) - 10)
+			    .attr("y", dunkScale(d["UnDunks"]) - 12)
+			    .text(d["Player"])
+			    .attr("class","label")
+			    .style("font-size", "7pt");
+			}
+			if (window.innerWidth > 660){
+				if (d["Player"] == "Damian Lillard" || 
+			    	d["Player"] == "Harden '17" ||
+			    	d["Player"] == "Wade '09" ||
+			    	d["Player"] == "Nash '06"){
+				    svg2.append("text")
+				    .attr("x",threesScale(d["Un3s"]) - 20)
+				    .attr("y", dunkScale(d["UnDunks"]) - 12)
+				    .text(d["Player"])
+				    .attr("class","label")
+				    .style("font-size", "7pt");
+				}
+				if (d["Player"] == "LeBron James" || 
+			    	d["Player"] == "O'Neal '01" || 
+			    	d["Player"] == "Howard '11" || 
+			    	d["Player"] == "O'Neal '05" ||
+			    	d["Player"] == "O'Neal '02" ||
+			    	d["Player"] == "Rudy Gobert" ||
+			    	d["Player"] == "Curry '16" ||
+			    	d["Player"] == "Harden '18" ||
+			    	d["Player"] == "Westbrook '17" ||
+			    	d["Player"] == "Kevin Durant" ||
+			    	d["Player"] == "James '06" ||
+			    	d["Player"] == "James '09" ||
+			    	d["Player"] == "James '18" ||
+			    	d["Player"] == "James '10"){
+				    svg2.append("text")
+				    .attr("x",threesScale(d["Un3s"]) + 9)
+				    .attr("y", dunkScale(d["UnDunks"]) + 3)
+				    .text(d["Player"])
+				    .attr("class","label")
+				    .style("font-size", "7pt");
+				}
+				if (d["Player"] == "Durant '10" ||
+			    	d["Player"] == "Bryant '03"){
+				    svg2.append("text")
+				    .attr("x",threesScale(d["Un3s"]) - 18)
+				    .attr("y", dunkScale(d["UnDunks"]) + 15)
+				    .text(d["Player"])
+				    .attr("class","label")
+				    .style("font-size", "7pt");
+				}
+				if (d["Player"] == "Bryant '06"){
+				    svg2.append("text")
+				    .attr("x",threesScale(d["Un3s"]) + 12)
+				    .attr("y", dunkScale(d["UnDunks"]) + 1)
+				    .text(d["Player"])
+				    .attr("class","label")
+				    .style("font-size", "7pt");
+				}
+				if (d["Player"] == "Durant '14"){
+				    svg2.append("text")
+				    .attr("x",threesScale(d["Un3s"]) + 12)
+				    .attr("y", dunkScale(d["UnDunks"]) + 5)
+				    .text(d["Player"])
+				    .attr("class","label")
+				    .style("font-size", "7pt");
+				}
+				if (d["Player"] == "Kemba Walker"){
+				    svg2.append("text")
+				    .attr("x",threesScale(d["Un3s"]) - 30)
+				    .attr("y", dunkScale(d["UnDunks"]) - 12)
+				    .text(d["Player"])
+				    .attr("class","label")
+				    .style("font-size", "7pt");
+				}
+			}
+		}
+	  });
+ 	});
+}
+
+func();
+graphit();
+
+  
 
 </script>
