@@ -168,7 +168,7 @@ svg.append("g").attr("transform", "translate(" + padding + "," + padding / 2 + "
 .call(d3.axisLeft(yScale).ticks(10).tickFormat(function(d){
                                                     return d+' ft';
                                                  }));
-svg.append("text").attr("transform", "rotate(270) translate(-170, 5)").text("Height");
+//svg.append("text").attr("transform", "rotate(270) translate(-170, 5)").text("Height");
 svg.append("text").attr("transform", "translate(" + (width/2+padding) + "," + 2*padding+")").text("1880")
   .style("font-size", "150px")
   .style("fill", year_color)
@@ -180,7 +180,7 @@ svg2.append("g").attr("transform", "translate(" + padding + "," + padding / 2 + 
 .call(d3.axisLeft(yScale).ticks(10).tickFormat(function(d){
                                                     return d+' ft';
                                                  }));
-svg2.append("text").attr("transform", "rotate(270) translate(-170, 5)").text("Height");
+//svg2.append("text").attr("transform", "rotate(270) translate(-170, 5)").text("Height");
 svg2.append("text").attr("transform", "translate(" + (width/2+padding) + "," + 2*padding+")").text("1880")
   .style("font-size", "150px")
   .style("fill", year_color)
