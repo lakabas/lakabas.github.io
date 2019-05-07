@@ -519,7 +519,7 @@ function slide(){
   .call(d3.axisLeft(yScale).ticks(10).tickFormat(function(d){
                                                     return d+' ft';
                                                  }));
-  svg.append("text").attr("transform", "rotate(270) translate(-170, 5)").text("Height");
+  //svg.append("text").attr("transform", "rotate(270) translate(-170, 5)").text("Height");
   current_heights1 = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
   //document.getElementById("date").innerHTML = document.getElementById("year").value;
   svg.append("text").attr("transform", "translate(" + (padding+width/2) + "," + 2*padding+")").text(""+document.getElementById("year").value)
@@ -538,7 +538,7 @@ function slide(){
   .call(d3.axisLeft(yScale).ticks(10).tickFormat(function(d){
                                                     return d+' ft';
                                                  }));
-  svg2.append("text").attr("transform", "rotate(270) translate(-170, 5)").text("Height");
+  //svg2.append("text").attr("transform", "rotate(270) translate(-170, 5)").text("Height");
   current_heights2 = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
   //document.getElementById("date").innerHTML = document.getElementById("year").value;
   svg2.append("text").attr("transform", "translate(" + (padding+width/2) + "," + 2*padding+")").text(""+document.getElementById("year").value)
