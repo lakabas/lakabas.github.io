@@ -542,9 +542,15 @@ function graphit(){
 		    .style("fill", colorScale(d["Unast"]))
 		    .on("mouseover", function () {
 		      svg2.select("#PlayerName").text(d["Player"]);
-		    })
+		      d3.select(this).transition()
+	            .duration("250")
+	            .attr("r", ptsScale(d["Pts"]) * 2);
+			 })
 		    .on("mouseout", function () {
 		      svg2.select("#PlayerName").text("");
+		      d3.select(this).transition()
+	            .duration("250")
+	            .attr("r", ptsScale(d["Pts"]));
 		    });
 
 		    if (d["Player"] == "James Harden"){
