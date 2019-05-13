@@ -2,149 +2,9 @@
 <head>
 <title>NBA MVP Personalized Preference</title>
 <script src="https://d3js.org/d3.v4.min.js"> </script>
-<style>
-
-h1 {
-	text-align: center;
-	font: bold 36px sans-serif; 
-}
-
-body {
-	font-family: sans-serif;
-}
-
-button {
-	font-size: 20px;
-	border: solid black 2px;
-	border-radius: 6px;
-}
-
-input[type="range"] {
-  -webkit-appearance: none;
-  background-color: #2c538c;
-  width: 200px;
-  height: 7px;
-  border-radius: 5px;
-  margin: 0 0 8 0;
-  outline: 0;
-}
-input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  background: url(bball.jpg);
-  background-size: 27.2px 20.3px;
-  background-position: -3.6px 0px;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  cursor: pointer;
-  transition: .3s ease-in-out;
-}​
-
-text {
-	font-family: sans-serif;
-}
-
-p {
-	font-size: 12px;
-}
-
-.enter {
-  fill: green;
-  font: bold 24px sans-serif;
-}
-
-.update {
-  fill: #333;
-  font: bold 24px sans-serif;
-}
-
-.exit {
-  fill: brown;
-  font: bold 24px sans-serif;
-}
-
-.enterr {
-  stroke: green;
-  stroke-width: 3px;
-  fill: #a9c5f2;
-}
-
-.updater {
-  stroke: #333;
-  stroke-width: 3px;
-  fill: #a9c5f2;
-}
-
-.exitr {
-  stroke: brown;
-  stroke-width: 3px;
-  fill: #a9c5f2;
-}
-
-#container {
-	width: 100%;
-	display: inline-block;
-	text-align: center;
-}
-
-#rankings {
-	width: 750px;
-	height: 520px;
-	display: inline-block;
-	border: solid black 3px;
-	background-image: url("mvp.jpg");
-	background-size: 1200px 750px;
-	background-position: -200px 0px;
-}
-
-#sliders {
-	background-color: #a9c5f2;
-	border: solid black 3px;
-	display: inline-block;
-	vertical-align: top;
-	margin-right: 10px;
-	margin-bottom: 10px;
-	width: 400px;
-	text-align: center;
-	height: 520px;
-}
-
-#graphdiv {
-	display: inline-block;
-	margin-left: 40px;
-    width: 600px;
-}
-
-#old {
-	display: block;
-    margin: auto;
-}
-
-#second {
-	background-color: #e1e9f7;
-	border: solid black 3px;
-}
-
-#container2 {
-	display: inline-block;
-	text-align: center;
-}
-
-#explain {
-	display: inline-block;
-	width: 260px;
-	margin-left: 10px;
-}
-
-#playerName {
-	font-weight: bold;
-}
-
-#glossary {
-	text-align: center;
-}
-
-</style>
+<script src="d3-tip.js"></script>
+<link rel="stylesheet" href="style.css">
+<link href="https://fonts.googleapis.com/css?family=Archivo+Black|Judson:400,700" rel="stylesheet">
 </head>
 
 <body onresize="func()">
@@ -152,32 +12,59 @@ p {
 <div id="container">
 
 	<div id="sliders">
-		<h3> How important are each of the following for an MVP candiate? </h3>
-		 <label>Statistical Profile: </label><br>
+		<h3> How important are each of the following? </h3>
+		 
+		 <label>Statistical Profile: </label> 
+		 <img class="exp tooltip" src="exp.png" onmouseover="show('tt1')" onmouseout="hide('tt1')">
+		 	<span id="tt1" class="tooltiptext">Traditional box score stats such as points, shooting percentage, assists, rebounds, blocks, and steals</span>
+		 </img><br>
          <input id="statprof" type="range" min="0" max="10" value="5">
          <br>
-         <label>Advanced Box Score Metrics: </label><br>
+
+         <label>Advanced Box Score Metrics: </label> 
+         <img class="exp tooltip" src="exp.png" onmouseover="show('tt2')" onmouseout="hide('tt2')">
+         	<span id="tt2" class="tooltiptext">VORP (Value Over Replacement Player), BPM (Box Plus-Minus), and WS (Win Shares)</span>
+         </img><br>
          <input id="boxscore" type="range" min="0" max="10" value="5">
          <br>
-         <label>Plus Minus / Impact Metrics: </label><br>
+
+         <label>Plus Minus / Impact Metrics: </label> 
+         <img class="exp tooltip" src="exp.png" onmouseover="show('tt3')" onmouseout="hide('tt3')">
+         	<span id="tt3" class="tooltiptext">RPM (Real Plus-Minus) and PIPM (Player Impact Plus-Minus)</span>
+         </img><br>
          <input id="plusminus" type="range" min="0" max="10" value="5">
          <br>
-         <label>Usage Rate: </label><br>
+
+         <label>Usage Rate: </label> 
+         <img class="exp tooltip" src="exp.png" onmouseover="show('tt4')" onmouseout="hide('tt4')">
+         	<span id="tt4" class="tooltiptext">An estimate of the percentage of the team's offense possessions that a player uses</span>
+         </img><br>
          <input id="usage" type="range" min="0" max="10" value="5">
          <br>
-         <label>Clutch Scoring: </label><br>
+
+         <label>Clutch Scoring: </label> 
+         <img class="exp tooltip" src="exp.png" onmouseover="show('tt5')" onmouseout="hide('tt5')">
+         	<span id="tt5" class="tooltiptext">Points and true shooting percentage in the last 5 minutes of games when the score is within 5 points</span>
+         </img><br>
          <input id="clutch" type="range" min="0" max="10" value="5">
          <br>
-         <label>Team Performance: </label><br>
+
+         <label>Team Performance: </label> 
+         <img class="exp tooltip" src="exp.png" onmouseover="show('tt6')" onmouseout="hide('tt6')">
+         	<span id="tt6" class="tooltiptext">Regular season record and team net rating with the given player on the court</span>
+         </img><br>
          <input id="team" type="range" min="0" max="10" value="5">
          <br>
-         <label>Playing More Minutes and Not Missing Games: </label><br>
+
+         <label>Playing More Minutes and Not Missing Games: </label> 
+         <br>
          <input id="minutes" type="range" min="0" max="10" value="5">
          <br>
+
         <h3> Indicate your preferences</h3>
          Defense <input id="offdef"" type="range" min="1" max="9" value="5"> Offense
          <br>
-         Efficiency <input id="voleff" type="range" min="1" max="9" value="5"> Scoring Volume
+         Efficiency <input id="voleff" type="range" min="1" max="9" value="5"> Total Points
          <br>
          <br>
          <button onclick="calculate()"> Calculate My Ballot </button>
@@ -189,22 +76,11 @@ p {
 
 </div>
 
-<div id="glossary">
-	<p>
-	* Statistical Profile encompasses traditional box score stats such as points, shooting percentage, assists, rebounds, blocks, and steals <br>
-	* Advanced Box Score Metrics includes VORP (Value Over Replacement Player), BPM (Box Plus-Minus), and WS (Win Shares), which are catch-all statistics generated using traditional box score stats <br>
-	* Plus Minus / Impact Metrics includes RPM (Real Plus-Minus) and PIPM (Player Impact Plus-Minus), both of which attempt to estimate a player's impact on their team using plus-minus data <br>
-	* Usage Rate is an estimate of the percentage of the team's offense possessions that a player uses <br>
-	* Clutch Scoring encompasses both scoring volume and efficiency in the last five minutes of games when the score is within five points <br>
-	* Team Performance includes team record and the team's net rating with a given player on the court <br>
-	</p>
-</div>
-
 <div id="second">
 <h1> Harden and Giannis Are Outliers Among Outliers</h1>
 <div id="container2">
     <div id="explain"> 
-    	<p> Included in the chart are all players from this season who finished in the Top 80 in both RPM Wins and VORP, finished in the Top 40 in one of those two stats, and played more than 29 minutes per game. That gave me a nice round number of 40 players that covered all legitimate MVP candidates as well as a few interesting oddballs (hello, Thaddeus Young). "Old MVP Candidates" includes all seasons since 2000-01 that finished in the top two in MVP voting or received at least five first place votes. </p>
+    	<p id="explanation"> Included in the chart are all players from this season who finished in the Top 80 in both RPM Wins and VORP, finished in the Top 40 in one of those two stats, and played more than 29 minutes per game. That gave me a nice round number of 40 players that covered all legitimate MVP candidates as well as a few interesting oddballs (hello, Thaddeus Young). "Old MVP Candidates" includes all seasons since 2000-01 that finished in the top two in MVP voting or received at least five first place votes. </p>
     	<br><br>
     	<svg id="key3" width="250" height="150">
 	      <defs>
@@ -241,8 +117,11 @@ p {
     	<button id="old" onclick="toggle()">Show Previous MVP Candidates</button>
 		<svg width="650" height="600" id="graph"></svg>
 	</div>
+
 </div>
 </div>
+<br>
+By Lev Akabas
 
 </body>
 </html>
@@ -264,6 +143,7 @@ var svg = d3.select("#rank"),
 
 var svg2 = d3.select("#graph")
 
+// Deals with Window Resizing
 function func(){
 	if (window.innerWidth > 915) {
 		document.getElementById("graphdiv").style.marginLeft = 40;
@@ -282,7 +162,7 @@ function func(){
 
 		document.getElementById("rank").style.width = 400;
 		document.getElementById("rankings").style.width = 400;
-		enterExit = 0;
+		enterExit = 30;
 		calculate();
 
 	} else if (axisLength != 500){
@@ -301,6 +181,7 @@ function func(){
 	
 }
 
+// Turns the data into numbers
 function mutateRow(row) {
   row["Pts"] = Number(row["Pts"]);
   row["Wins"] = Number(row["Wins"]);
@@ -331,6 +212,8 @@ function mutateRow(row) {
   return row;
 }
 
+
+// Updates the ballot rankings and controls the animation
 function update(data){
 
   var t = d3.transition().duration(5000);
@@ -374,6 +257,8 @@ function update(data){
       .attr("class", "enterr")
       .attr("x", -400 + enterExit)
       .attr("y", function(d, i) { return i * 50 - 20; })
+      .attr("rx", 7)
+      .attr("ry", 7)
       .attr("width", 400)
       .attr("height", 40)
       .style("fill-opacity", 1e-6)
@@ -390,6 +275,8 @@ function update(data){
       .attr("dy", ".35em")
       .attr("x", -400 + enterExit)
       .attr("y", function(d, i) { return i * 50; })
+      .attr("rx", 7)
+      .attr("ry", 7)
       .style("fill-opacity", 1e-6)
       .text(function(d, i) { return (i + 1) + ". " + d["Player"]; })
       .transition(t)
@@ -397,10 +284,9 @@ function update(data){
       .style("fill-opacity", 1)
       .transition(t)
       .attr("class", "update");
-
-    
 }
 
+// Calculates a score for each player based on the input weights, then updates the ballot based on the top 10 players
 function calculate(){
   var data = rawData
   var statprof = document.getElementById("statprof").value
@@ -427,8 +313,6 @@ function calculate(){
   	  			(statprof * SP + boxscore * BS + plusminus * PM + usage * U + clutch * C + team * T)
 
   	data[p]["Score"] = score
-  	console.log(data[p]["Player"]);
-  	console.log(SP)
   }
 
   var sorted = data.sort( function(a, b){return b["Score"] - a["Score"]} );
@@ -437,12 +321,27 @@ function calculate(){
   update(top10);
  }
 
+// Calls in the data used for the rankings and stores it in the global variable
  d3.csv("scales.csv", mutateRow, function (error, data) {
 	rawData = data;
  });
 
+// The tool tip for the players' names in the graph
+var tool_tip = d3.tip()
+      .attr("class", "d3-tip")
+      .offset([-8, 0])
+      .html(function(d) { console.log(d); return d["Player"]; });
+svg2.call(tool_tip);
 
+// Toggles the tool tips that explain what the different factors for the rankings mean
+function show(id){
+	document.getElementById(id).style.visibility = "visible";
+}
+function hide(id){
+	document.getElementById(id).style.visibility = "hidden";
+}
 
+// Turns the data into numbers
  function mutateRow2(row) {
   row["UnDunks"] = Number(row["UnDunks"]);
   row["Un3s"] = Number(row["Un3s"]);
@@ -452,6 +351,7 @@ function calculate(){
   return row;
 }
 
+// Controls the showing and hiding of the dots representing old MVP candidates
 function toggle(){
 	if (old == false){
 		old = true;
@@ -463,6 +363,7 @@ function toggle(){
 	graphit();
 }
 
+// Creates the axes, axis labels, and legend for the graph
 function axes(dunkScale,threesScale,ptsScale){
 	svg2.selectAll("*").remove();
 	  var dunkAxis = d3.axisLeft(dunkScale);
@@ -488,6 +389,7 @@ function axes(dunkScale,threesScale,ptsScale){
       }
 }
 
+// Clears the svg, calls in the data, creates a bunch of relevant scales, and graphs a circle for each datapoint
 function graphit(){
 	svg2.selectAll("circle").remove();
 	svg2.selectAll(".label").remove();
@@ -526,40 +428,28 @@ function graphit(){
 	  .domain([colorMax,colorMax - (colorHalf-colorMin)/2,colorHalf,(colorMax - colorHalf)/2 + colorMin,colorMin])
 	  .range(["#a9c5f2","#1b7aba","#125887","#082b42","#000000"]);
 
-	  svg2.append("text")
-		.attr("id", "PlayerName")
-		.attr("x", axisLength * 275/500)
-		.attr("y", axisLength * 250/500)
-		.style("font-size", (axisLength * 20/500) + "pt");
+	  rawDataFiltered = rawData2.filter(function(d){return d["Old"] == 0 || old == true;})
 
+	  svg2.selectAll("circle").data(rawDataFiltered)
+	  	.enter().append("circle")
+	  	.attr("cx", function(d) { return threesScale(d["Un3s"]);})
+		    .attr("cy", function(d) { return dunkScale(d["UnDunks"]);})
+		    .attr("r", function(d) { return ptsScale(d["Pts"]);})
+		    .style("opacity", 1) // - d["Old"] * .5)
+		    .style("fill", function(d) { return colorScale(d["Unast"]);})
+		    .on('mouseover', tool_tip.show)
+      		.on('mouseout', tool_tip.hide);
+
+      // Adds text for players who get their names next to their dots
 	  rawData2.forEach(function (d) {
 	  	if (d["Old"] == 0 || old == true){
-		    svg2.append("circle")
-		    .attr("cx", threesScale(d["Un3s"]))
-		    .attr("cy", dunkScale(d["UnDunks"]))
-		    .attr("r", ptsScale(d["Pts"]))
-		    .style("opacity", 1) // - d["Old"] * .5)
-		    .style("fill", colorScale(d["Unast"]))
-		    .on("mouseover", function () {
-		      svg2.select("#PlayerName").text(d["Player"]);
-		      d3.select(this).transition()
-	            .duration("250")
-	            .attr("r", ptsScale(d["Pts"]) * 2);
-			 })
-		    .on("mouseout", function () {
-		      svg2.select("#PlayerName").text("");
-		      d3.select(this).transition()
-	            .duration("250")
-	            .attr("r", ptsScale(d["Pts"]));
-		    });
-
 		    if (d["Player"] == "James Harden"){
 			    svg2.append("text")
 			    .attr("x",threesScale(d["Un3s"]) - 30)
 			    .attr("y", dunkScale(d["UnDunks"]) - 12)
 			    .text(d["Player"])
 			    .attr("class","label")
-			    .style("font-size", "7pt");
+			    .style("font-size", "9pt");
 			}
 			if (d["Player"] == "Giannis Antetokounmpo"){
 			    svg2.append("text")
@@ -567,11 +457,10 @@ function graphit(){
 			    .attr("y", dunkScale(d["UnDunks"]) - 12)
 			    .text(d["Player"])
 			    .attr("class","label")
-			    .style("font-size", "7pt");
+			    .style("font-size", "9pt");
 			}
 			if (window.innerWidth > 660){
-				if (d["Player"] == "Damian Lillard" || 
-			    	d["Player"] == "Harden '17" ||
+				if (d["Player"] == "Harden '17" ||
 			    	d["Player"] == "Wade '09" ||
 			    	d["Player"] == "Nash '06"){
 				    svg2.append("text")
@@ -579,10 +468,9 @@ function graphit(){
 				    .attr("y", dunkScale(d["UnDunks"]) - 12)
 				    .text(d["Player"])
 				    .attr("class","label")
-				    .style("font-size", "7pt");
+				    .style("font-size", "9pt");
 				}
-				if (d["Player"] == "LeBron James" || 
-			    	d["Player"] == "O'Neal '01" || 
+				if (d["Player"] == "O'Neal '01" || 
 			    	d["Player"] == "Howard '11" || 
 			    	d["Player"] == "O'Neal '05" ||
 			    	d["Player"] == "O'Neal '02" ||
@@ -600,16 +488,7 @@ function graphit(){
 				    .attr("y", dunkScale(d["UnDunks"]) + 3)
 				    .text(d["Player"])
 				    .attr("class","label")
-				    .style("font-size", "7pt");
-				}
-				if (d["Player"] == "Durant '10" ||
-			    	d["Player"] == "Bryant '03"){
-				    svg2.append("text")
-				    .attr("x",threesScale(d["Un3s"]) - 18)
-				    .attr("y", dunkScale(d["UnDunks"]) + 15)
-				    .text(d["Player"])
-				    .attr("class","label")
-				    .style("font-size", "7pt");
+				    .style("font-size", "9pt");
 				}
 				if (d["Player"] == "Bryant '06"){
 				    svg2.append("text")
@@ -617,7 +496,7 @@ function graphit(){
 				    .attr("y", dunkScale(d["UnDunks"]) + 1)
 				    .text(d["Player"])
 				    .attr("class","label")
-				    .style("font-size", "7pt");
+				    .style("font-size", "9pt");
 				}
 				if (d["Player"] == "Durant '14"){
 				    svg2.append("text")
@@ -625,15 +504,16 @@ function graphit(){
 				    .attr("y", dunkScale(d["UnDunks"]) + 5)
 				    .text(d["Player"])
 				    .attr("class","label")
-				    .style("font-size", "7pt");
+				    .style("font-size", "9pt");
 				}
-				if (d["Player"] == "Kemba Walker"){
+				if (d["Player"] == "Kemba Walker" || 
+					d["Player"] == "Damian Lillard"){
 				    svg2.append("text")
-				    .attr("x",threesScale(d["Un3s"]) - 30)
+				    .attr("x",threesScale(d["Un3s"]) - 35)
 				    .attr("y", dunkScale(d["UnDunks"]) - 12)
 				    .text(d["Player"])
 				    .attr("class","label")
-				    .style("font-size", "7pt");
+				    .style("font-size", "9pt");
 				}
 			}
 		}
@@ -641,9 +521,9 @@ function graphit(){
  	});
 }
 
+// Upon loading of the page, the window size is used to change adjust global variables, and then the graph is drawn
 func();
 graphit();
 
-  
 
 </script>
