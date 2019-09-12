@@ -79,29 +79,13 @@ p {
   color: #767678;
 }
 
-@media only screen and (min-width: 500px){
-  #instructions {
+.wide {
     display: none;
-  }
-  #slider {
-    display: none;
-  }
-  #container {
-    background-color: #263238;
-    height: 4300px;
-  }
 }
 
-@media only screen and (max-width: 500px){
-  .step {
-    display: none;
-  }
-  #container {
+#container {
     background-color: #263238;
-    height: 1000px;
-  }
 }
-  
 
 #instructions {
   color: white;
