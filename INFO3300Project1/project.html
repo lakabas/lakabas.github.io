@@ -339,6 +339,9 @@ var colorScale = d3.scaleLinear()
     var w = window.innerWidth
     if (w > 500){
       document.getElementById('container').style.height = '4300px';
+      document.getElementById('instructions').classList.add('wide');
+      document.getElementById('slider').classList.add('wide');
+      document.getElementById('sections').classList.add('wide');
       var scroll = scroller()
         .container(d3.select('#graphic'));
       // pass in .step selection as the steps
@@ -357,6 +360,9 @@ var colorScale = d3.scaleLinear()
       }
     } else {
       document.getElementById('container').style.height = '1000px';
+      document.getElementById('instructions').classList.remove('wide');
+      document.getElementById('slider').classList.remove('wide');
+      document.getElementById('sections').classList.add('wide');
       var scroll = scroller()
         .container(d3.select('#graphic'));
       // pass in .step selection as the steps
