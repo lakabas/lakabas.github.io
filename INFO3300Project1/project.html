@@ -337,7 +337,7 @@ var colorScale = d3.scaleLinear()
   function func(){
     console.log("here");
     var w = window.innerWidth
-    if (w > 500){
+    if (w > 800){
       document.getElementById('container').style.height = '4300px';
       document.getElementById('instructions').classList.add('wide');
       document.getElementById('slider').classList.add('wide');
@@ -351,13 +351,8 @@ var colorScale = d3.scaleLinear()
         // activate current section
         activate(index);
       });
-      if (w > 800){
-        end = 4070;
-        console.log(end);
-      }
-      else {
-        end = 4180 + (800 - w);
-      }
+      end = 4070;
+      console.log(end);
     } else {
       document.getElementById('container').style.height = '1000px';
       document.getElementById('instructions').classList.remove('wide');
