@@ -31,6 +31,25 @@ h2{
   text-align: center;
   color: #7D1935;
 }
+img {
+  width: 100%;
+}
+p {
+  margin-left: 50px;
+}
+.parralax {
+  /* The image used */
+  background-image: url("img_parallax.jpg");
+
+  /* Set a specific height */
+  min-height: 500px; 
+
+  /* Create the parallax scrolling effect */
+  background-attachment: fixed;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
 .navigation-link {
   padding-left: 40px;
   text-decoration: none;
@@ -40,7 +59,7 @@ h2{
   color: #7D1935;
 }
 .navigation {
-  background-color: #F5F3EE;
+
   color: #4A96AD;
   height: 80px;
 }
@@ -48,10 +67,79 @@ h2{
   text-decoration:none;
   color: #4A96AD;
 }
-p {
+.lev:hover {
+  color: #7D1935;
+}
+.paragraph {
   color: #7D1935;
   width: 70%;
   margin: 0 auto;
+  float: left;
+}
+.container {
+  width: 70%;
+  margin: auto;
+  height: 400px;
+}
+.supercontainer {
+  width: 100%;
+}
+.photo {
+  width: 30%;
+  float: left;
+}
+.block {
+  width: 300px;
+  height: 200px;
+  background-color: #7D1935;
+  color: white;
+  margin: 0 auto;
+  margin-left: 50px;
+  text-align: center;
+  line-height: 200px;
+}
+a {
+  text-decoration: none;
+  color: #4A96AD;
+}
+.viz {
+  font-size: 20px;
+  text-decoration: bold;
+  margin-top: 90px;
+  visibility: hidden;
+}
+.links {
+  width: 90%;
+  margin: auto;
+  height: 300px;
+  display: flex;
+}
+.one {
+  background-image: url("viz1.png");
+  background-size: 300px 200px;
+  float: left;
+}
+.two {
+  background-image: url("Carter.jpg");
+  background-size: 300px 200px;
+  float: left;
+}
+.three {
+  background-image: url("SLAM.png");
+  background-size: 300px 200px;
+  float: left;
+}
+.block:hover {
+  background-color: #7D1935;
+  background-image: none;
+  color: white;
+  text-align: center;
+}
+.visible {
+  visibility: visible;
+}
+.viz:hover {
+  color: white;
 }
 @media only screen and (max-width: 800px) {
   h1 {
@@ -71,11 +159,38 @@ p {
   .navigation {
     height: 150px;
   }
+  .links {
+    display: block;
+  }
+  .block {
+    margin-right: 200px;
+  }
 }
 
 
 </style>
+<script>
+ function func() {
+  document.getElementById("one").classList.add("visible");
+ }
+ function func2() {
+  document.getElementById("two").classList.add("visible");
+ }
+  function func3() {
+  document.getElementById("three").classList.add("visible");
+ }
+ function funct() {
+  document.getElementById("one").classList.remove("visible");
+ }
+ function funct2() {
+  document.getElementById("two").classList.remove("visible");
+ }
+ function funct3() {
+  document.getElementById("three").classList.remove("visible");
+ }
+</script>
 </head>
+
 
 <body>
   <div class="navigation">
@@ -87,7 +202,34 @@ p {
     </nav>
   </div>
   <br><br>
-  <p>I'm Lev Akabas, a recent Cornell Computer Science graduate. I've written and edited for student newspapers for the past eight years, including two years as an Editor for The Cornell Daily Sun, and I've interned for SLAM Magazine and The New York Times. I'm interested in sports, pop culture, and politics, and I'd like to combine journalism and technology to help people learn about these topics.</p> 
+  <div class="parallax"></div>
+  <div class='supercontainer'>
+  <div class='container'>
+    <div class='photo'>
+      <img src="Lev_Akabas_Headshot.jpg">
+    </div>
+    <div class='paragraph'>
+      <p>I'm Lev Akabas, a journalist and front-end web developer. I was an Editor for The Cornell Daily Sun for two years, and I've interned for both SLAM Magazine and The New York Times. Most recently, I created custom data visualizations for a <a href="http://www.zerodown.com/guide" target="_blank">guide</a> to buying homes in the Bay Area published by ZeroDown, a San Francisco-based startup. <br><br>
+      To get in touch, shoot me an email at lakabas15@gmail.com.</p> 
+    </div>
+  </div>
+  </div>
+
+  <div class="links">
+    <div class="block one" onmouseover="func()" onmouseout="funct()">
+      <a class="viz" id="one" href="https://lakabas.github.io/viz.html">Data Visualizations</a>
+    </div>
+    <br>
+    <div class="block two" onmouseover="func2()" onmouseout="funct2()">
+      <a class="viz" id="two" href="https://lakabas.github.io/blogs.html">Blogs</a>
+    </div>
+    <br>
+    <div class="block three" onmouseover="func3()" onmouseout="funct3()">
+      <a class="viz" id="three" href="https://lakabas.github.io/clips.html">Journalism Clips</a>
+    </div>
+
+    <br>
+    <br>
 
 </body>
 </html>
