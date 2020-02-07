@@ -1,0 +1,14 @@
+#graph {
+	border-width: 5px;
+	border-color: black;
+	border-style: solid;
+}
+
+#speedSlider {
+	margin-bottom: 50px;
+	width: 500px;
+}
+
+.graphContainer {
+	text-align: center
+}

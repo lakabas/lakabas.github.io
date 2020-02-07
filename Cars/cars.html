@@ -1,0 +1,216 @@
+<html>
+<head>
+  <title>Self Driving Taxi Fleet Simulation</title>
+  <meta charset=utf-8>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://d3js.org/d3.v4.min.js"> </script>
+  <link rel="stylesheet" href="app.css">
+</head>
+
+<body style="overflow-x:hidden;" onresize="func()">
+      <div class="graphContainer">
+      	<h3> Adjust Speed </h3>
+      	Slow <input type="range" width="500" min="0" max="10000" value="3000" class="slider" id="speedSlider"> Fast<br>
+        <svg id="graph" width="1050px" height="650px"></svg>
+      </div>
+</body>
+</html>
+
+
+<script>
+  // GLOBAL VARIABLES
+  var rawData;
+  var numTimes;
+  var numCars;
+  var speed = 3000;
+  var SVGwidth = 1150;
+  var SVGheight = 650;  
+  // svgs
+  var svg = d3.select("#graph");
+  // scales
+  var xScale = d3.scaleLinear()
+  					.domain([-1000,4000])
+  					.range([0,SVGwidth-150])
+  var yScale = d3.scaleLinear()
+  					.domain([0,22000])
+  					.range([SVGheight,0])
+  var speedScale = d3.scaleSqrt()
+  					.domain([0,10000])
+  					.range([5000,10])
+  var simScale = d3.scaleLinear()
+  					.domain([0,10000])
+  					.range([0,numTimes])
+  var countScale; 
+
+
+  function func() {
+    var windowWidth = window.innerWidth;
+    if (window.innerWidth > SVGwidth) {
+      sizeSVGs();
+    } else {
+
+    }
+  }
+
+  function responsivefy(svg) {
+    // container will be the DOM element
+    // that the svg is appended to
+    // we then measure the container
+    // and find its aspect ratio
+    const container = d3.select(svg.node().parentNode),
+      width = parseInt(svg.style('width'), 10),
+      height = parseInt(svg.style('height'), 10),
+      aspect = width / height;
+    // set viewBox attribute to the initial size
+    // control scaling with preserveAspectRatio
+    // resize svg on inital page load
+    svg.attr('viewBox', `0 0 ${width} ${height}`)
+      .attr('preserveAspectRatio', 'xMinYMid meet')
+    if (window.innerWidth <= SVGwidth) {
+      resize(svg);
+    }
+    // add a listener so the chart will be resized
+    // when the window resizes
+    // multiple listeners for the same event type
+    // requires a namespace, i.e., 'click.foo'
+    // api docs: https://goo.gl/F3ZCFr
+    window.addEventListener('resize', function (event) {
+      if (window.innerWidth <= SVGwidth) {
+        resize(svg)// do stuff here
+      }
+    });
+    // this is the code that resizes the chart
+    // it will be called on load
+    // and in response to window resizes
+    // gets the width of the container
+    // and resizes the svg to fill it
+    // while maintaining a consistent aspect ratio
+    function resize(svg) {
+      const w = parseInt(container.style('width'));
+      svg.attr('width', w - 10);
+      svg.attr('height', Math.round((w - 10) / aspect));
+    }
+  }
+
+  function sizeSVGs(){
+    svg
+      .attr('width', SVGwidth)
+      .attr('height', SVGheight)
+  }
+
+  function callResponsive(){
+    svg.call(responsivefy);
+  }
+
+  // Turns the data into numbers from the csv file
+   function mutateRow(row) {
+    row["time"] = Number(row["time"]);
+    var i = 0;
+    var allLocations = [];
+    var states = {'idle': 0, 'enroute_dropoff': 0, 'enroute_pickup': 0};
+    while (row["" + i] != undefined){
+    	var stringArray = row["" + i].replace("'",'"').replace("'",'"');
+    	var array = JSON.parse(stringArray)
+    	allLocations.push(array);
+    	states[array[0]] += 1;
+    	i++;
+    }
+    row["locations"] = allLocations;
+    row["states"] = states;
+    return row;
+  }
+
+  // Clears the svg, calls in the data, and calls the individual functions for each graph
+  function graphIt(){
+    svg.selectAll("*").remove();
+    d3.csv("data.csv", mutateRow, function (error, data) {
+      rawData = data;
+      numCars = rawData[0]["locations"].length;
+      numTimes = rawData.length;
+      countScale = d3.scaleLinear()
+    					.domain([0,numCars])
+    					.range([0,SVGheight / 2]);
+      initiate();
+      animate();
+    });
+  }
+
+  function initiate(){
+  	var opening = rawData[0]; 
+
+  	svg.selectAll(".car")
+    .data(opening["locations"])
+    .enter().append("svg:image")
+    .attr("class", "car")
+    .attr("width", 15)
+    .attr("height", 15)
+    .attr("x", function(d) { return xScale(d[1]);})
+    .attr("y", function(d) { return yScale(d[2]);})
+    .attr("xlink:href", "blackcar.png")
+    .style("fill", 'black')
+
+    var countScale = d3.scaleLinear()
+    					.domain([0,numCars])
+    					.range([0,SVGheight / 2]);
+
+    svg.selectAll(".count")
+    .data(Object.keys(opening["states"]))
+    .enter().append("rect")
+    .attr("class", "count")
+    .attr("width", 30)
+    .attr("height", function(d) {return countScale(opening["states"][d])})
+    .attr("x", function(d, i) { return SVGwidth - 100 + i * 33;})
+    .attr("y", function(d) { return SVGheight/2 + 10 - countScale(opening["states"][d]);})
+    .style("fill", function(d) { return d == "idle" ? "black" : (d == "enroute_pickup" ? "red" : "green")})
+
+    svg.selectAll(".labels")
+    .data(Object.keys(opening["states"]))
+    .enter().append("text")
+    .attr("y", SVGheight/2 + 20)
+    .attr("x", function(d, i) { return SVGwidth - 100 + 15 + i * 33;})
+    .attr('text-anchor', 'middle')
+    .style("font-size", "10px")
+	.style("fill", function(d) { return d == "idle" ? "black" : (d == "enroute_pickup" ? "red" : "green")})
+    .text(function (d) { return d == "idle" ? "Idle" : (d == "enroute_pickup" ? "Pickup" : "Dropoff")})
+
+  }
+
+  function animate(){
+  	var y = 1
+	function show() {  
+		speed = speedScale(document.getElementById("speedSlider").value);    
+		setTimeout(function() {    
+	      transition(y);   
+	      y++;                  
+	      if (y <= numTimes) {            
+	         show();             
+	      }                        
+	   }, speed)
+	}
+	show();
+  }
+
+  function transition(timeStamp){
+	svg.selectAll(".car")
+	  	.data(rawData[timeStamp]["locations"])
+	  	.attr("xlink:href", function(d) { return d[0] == 'enroute_dropoff' ? "greencar.png" : 
+	  											(d[0] == 'idle' ? "blackcar.png" : "redcar.png")})
+	  	.transition().duration(speed).ease(d3.easeLinear)
+	    .attr("x", function(d) { return xScale(d[1]);})
+	    .attr("y", function(d) { return yScale(d[2]);})
+
+	svg.selectAll(".count")
+	  	.data(Object.keys(rawData[timeStamp]["states"]))
+	  	.transition().duration(speed).ease(d3.easeLinear)
+	  	.attr("height", function(d) {return countScale(rawData[timeStamp]["states"][d]) })
+	    .attr("y", function(d) { return SVGheight/2 + 10 - countScale(rawData[timeStamp]["states"][d])})
+}
+	
+
+  // Upon loading of the page, the window size is used to change adjust global variables, and then the graphs are drawn
+  func();
+  sizeSVGs();
+  callResponsive();
+  graphIt();
+
+</script>
