@@ -1,0 +1,50 @@
+<html>
+<head>
+  <title>NCAA Financials</title>
+  <meta charset=utf-8>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://d3js.org/d3.v4.min.js"> </script>
+  <style>
+
+  #graph {
+  border-width: 5px;
+  border-color: black;
+  border-style: solid;
+}
+
+#speedSlider {
+  margin-bottom: 50px;
+  width: 70%;
+}
+#clockSlider {
+  margin-bottom: 50px;
+  width: 70%;
+}
+#start {
+  margin-bottom: 50px;
+}
+.hidden {
+  display: none;
+}
+.graphContainer {
+  text-align: center
+}
+rect:hover{
+  fill:black;
+}
+body{
+  font-family:monospace;
+}
+.xaxis{
+  font-size: 6pt;
+}
+
+  </style>
+</head>
+
+<body style="overflow-x:hidden;">
+  <svg id="graph" width="1200px" height="650px"></svg>
+  <script src="script.js"> </script>
+</body>
+</html>
+
