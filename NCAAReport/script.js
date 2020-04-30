@@ -132,7 +132,7 @@
 
             // transition the frequency labels location and change value.
             bars.select("text").transition().duration(500)
-                .text(function(d){ return d[vari] == 0 ? "" : formatNumber(d[vari])})
+                .text(function(d){ return d[vari] == 0 ? "" : "$" + formatNumber(d[vari])})
                 .attr("y", function(d) {return y(d[vari]) + paddingTop - 5; });    
 
             var t = d3.transition().duration(500);
