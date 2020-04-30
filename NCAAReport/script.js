@@ -93,7 +93,7 @@
             .on("mouseout",mouseout);// mouseout is defined below.
             
         //Create the frequency labels above the rectangles.
-        bars.append("text").text(function(d){ return d[column] == 0 ? "" : formatNumber(d[column])})
+        bars.append("text").text(function(d){ return d[column] == 0 ? "" : "$" + formatNumber(d[column])})
             .attr("x", function(d) { return x(d["Team"])+x.bandwidth()/2 + padding; })
             .attr("y", function(d) { return y(d[column]) + paddingTop -5; })
             .style("font-size", "6pt")
@@ -103,7 +103,7 @@
             .attr("class","histHead")
             .text(column.substring(2) + " " + (column.substring(0,2) == "R " ? "Revenue" : "Expenses"))
             .attr("x", padding + 250)
-            .attr("y", paddingTop - 10)
+            .attr("y", paddingTop - 30)
             .style("font-size", "12pt")
             .attr("text-anchor", "middle");
         
