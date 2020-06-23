@@ -1,0 +1,201 @@
+<html>
+<head>
+  <title>NCAA Financials</title>
+  <meta charset=utf-8>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://d3js.org/d3.v4.min.js"> </script>
+  <script src="us-states.js"> </script>
+  <style>
+
+  button
+  {
+    padding: 8px;
+    background-color: #ddd;
+    border: 0px;
+    cursor: pointer;
+    font-family: "neutra-2-display-1";
+    text-transform: uppercase;
+    font-weight: 800;
+    font-size: 11px;
+    letter-spacing: .25em;
+    border-bottom: 3px solid #ccc;
+       -moz-transition: all 0.15s;
+         -o-transition: all 0.15s;
+    -webkit-transition: all 0.15s;
+            border-radius: 2px;
+       -moz-border-radius: 2px;
+         -o-border-radius: 2px;
+    -webkit-border-radius: 2px;
+    transition: all 0.15s;
+  }
+
+  button:hover
+  {
+    background-color: #555;
+    color: white;
+    border-bottom: 3px solid #222;
+  }
+
+  button.selected
+  {
+    background-color: #555;
+    color: white;
+    border-bottom: 3px solid #222;
+  }
+
+   circle:hover
+  {
+    fill-opacity: .9 !important;
+    stroke-width: 2;
+    stroke: black;
+  }
+
+    #tooltip
+  {
+    position: absolute;
+    width: 190px;
+    height: auto;
+    padding: 10px;
+    background-color: white;
+    -webkit-box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.4);
+    -moz-box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.4);
+    box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.4);
+    pointer-events: none;
+  }
+
+  #tooltip.hidden
+  {
+    display: none;
+    -moz-transition: all 0.15s;
+    -o-transition: all 0.15s;
+    -webkit-transition: all 0.15s;
+    transition: all 0.15s;
+  }
+
+   text
+  {
+    fill: #444;
+    font-family: "Georgia";
+    /*text-transform: uppercase;*/
+    letter-spacing: .05em;
+    font-size: 11px;
+  }
+
+  #conference
+  {
+    padding: 5px;
+    float: right;
+    border: 1px solid gray;
+  }
+
+  #name, #conference
+  {
+    font-weight: bold;
+  }
+
+  #name
+  {
+    font-size: 15px;
+    width: 100px;
+  }
+
+  #name-conf
+  {
+/*    border-bottom: 1px solid gray;*/
+    padding-bottom: 5px;
+    margin-bottom: 10px;
+  }
+
+  #conference
+  {
+    color: gray;
+    font-size: 12px;
+  }
+
+  .label-wrap
+  {
+    border-top: 1px solid gray;
+    margin-bottom: 7px;
+  }
+
+  .label
+  {
+    color: gray;
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 1px;
+    float: left;
+    width: 100px;
+    padding-top: 3px;
+  }
+
+  .label-number
+  {
+    font-size: 15px;
+  }
+
+  #graph {
+  border-width: 5px;
+  border-color: black;
+  border-style: solid;
+}
+
+#speedSlider {
+  margin-bottom: 50px;
+  width: 70%;
+}
+#clockSlider {
+  margin-bottom: 50px;
+  width: 70%;
+}
+#start {
+  margin-bottom: 50px;
+}
+.graphContainer {
+  text-align: center
+}
+rect:hover{
+  fill:black;
+}
+body{
+  font-family:Georgia;
+}
+.xaxis{
+  font-size: 6pt;
+}
+.sorts {
+  padding-bottom:10px;
+}
+
+  </style>
+</head>
+
+<body>
+<div class="sorts">
+        <span class="sort_label">Choose a View</span>
+        <button id="show_map" class="selected">Map</button>
+        <button id="show_conferences">By Conference</button>
+        <button id="show_sorted">Sorted</button>
+        <span class="sort_label">Choose Data</span>
+        <button id="sort_rev" class="selected">Revenue</button>
+        <button id="sort_exp" class="padding-right">Expenses</button>
+        <span class="sort_label"> </span>
+</div>
+  <div id="tooltip" class="hidden">
+          <div id="name-conf">
+            <span id="name">North Carolina State</span>
+            <span id="conference">ACC</span>
+          </div>
+          <div class="label-wrap">
+            <div class="label">Expenses</div>
+            <div class="label-number" id="expenses">$13456789</div>
+          </div>
+          <div class="label-wrap">
+            <div class="label">Revenue</div>
+            <div class="label-number" id="revenue">$26456789</div>
+          </div>
+  </div>
+  <svg id="graph" height="780px" width="1200px"></svg>
+  <script src="index.js"> </script>
+</body>
+</html>
