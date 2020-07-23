@@ -1,0 +1,240 @@
+<html>
+<head>
+<title>NBA Standings Draw</title>
+<link href="https://fonts.googleapis.com/css?family=Crimson+Text" rel="stylesheet"><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/styles/default.min.css">
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/highlight.min.js"></script>
+<style>
+@font-face {
+  font-family: myFirstFont;
+  src: url(Geograph/Geograph-Thin.otf);
+}
+@font-face {
+  font-family: mySecondFont;
+  src: url(Geograph/Geograph-Medium.otf);
+}
+body{
+  font-family:myFirstFont;
+  letter-spacing:0.05em;
+}
+h2 {
+	font-family:mySecondFont;
+    letter-spacing:0.05em;
+    text-align: center;
+}
+svg { 
+	border: solid #ccc 1px; 
+	background-color: #f0f0f0;
+}
+#top {
+	text-align: center;
+	margin-bottom: 10px;
+}
+#toggle {
+	background-color: transparent; 
+	color: black; 
+	text-align: center; 
+	font-size: 16px; 
+	border: 2px solid #343a40; 
+	padding: 10px 24px; 
+	font-weight:700; 
+	stroke: #343a40
+}
+#toggle:hover {
+	background-color: grey;
+}
+path.lineGraph { 
+		fill: none; 
+		stroke-width: 2; 
+}
+</style>
+</head>
+<body>
+<h2> 2020 NBA Season: How Did We Get Here?</h2>
+<div id="top">
+	<select id="conf" onchange="changeconf()">
+	  <option value="east">Eastern Conference</option>
+	  <option value="west">Western Conference</option>
+	</select>
+	<button id="toggle" type="button" onclick="show(0)">Animate</button>
+</div>
+<!-- Here's an SVG element. Note that in this file it looks like the <div> above. -->
+<svg height="500" width="1200">
+  <g id="plot"> 
+  </g>
+</svg>
+
+<script>
+
+var teams = ["ATL", "BOS", "CHA", "CHI", "CLE", "DAL", "DEN", "DET", "GSW", "HOU", "IND", "LAC", "LAL", "MEM", "MIA", "MIL", "MIN", "BRK", "NOH", "NYK", "OKC", "ORL", "PHI", "PHO", "POR", "SAC", "SAS", "TOR", "UTA", "WAS"];
+
+var logos = [];
+var allData = {};
+var length;
+var padding = 30;
+var height = 500;
+var width = 1200;
+var xScale;
+var yScale;
+var conf = "east"
+var logosize = 30;
+var days = 1;
+
+var eastIndeces = {"ATL": 0, "BOS": 1, "CHO": 2, "CHI": 3, "CLE": 4, "DET": 5, "IND": 6, "MIA": 7, "MIL": 8, "BRK": 9, "NYK": 10, "ORL": 11, "PHI": 12, "TOR": 13, "WAS": 14}
+var eastTeams = ["ATL", "BOS", "CHO", "CHI", "CLE", "DET", "IND", "MIA", "MIL", "BRK", "NYK", "ORL", "PHI", "TOR", "WAS"]
+var eastColors = ["#E03A3E","#007A33","#00788C","#CE1141","#860038","#1D42BA","#FDBB30","#41B6E6","#00471B","#000000","#F58426","#0077C0","#ED174C","#753BBD","#002B5C"]
+
+var westIndeces = {"DAL": 0, "DEN": 1, "GSW": 2, "HOU": 3, "LAC": 4, "LAL": 5, "MEM": 6, "MIN": 7, "NOP": 8, "OKC": 9, "PHO": 10, "POR": 11, "SAC": 12, "SAS": 13, "UTA": 14}
+var westTeams = ["DAL","DEN","GSW","HOU","LAC","LAL","MEM","MIN","NOP","OKC","PHO","POR","SAC","SAS","UTA"]
+var westColors = ["#00843D","#0E2240","#FFC72C","#CE1141","#1D428A","#552583","#5D76A9","#78BE20","#85714D","#EF3B24","#1D1160","#E03A3E","#5A2D81","#000000","#753BBD"]
+
+var w = {"east":[1,2,1,1,1,1,2,2,2,2,1,2,2,2,1],"west":[2,2,1,2,2,2,2,1,1,2,1,1,1,1,2]}
+var indeces = {"east": eastIndeces, "west": westIndeces}
+var teams = {"east": eastTeams, "west":westTeams}
+var colors = {"east": eastColors, "west":westColors}
+
+var svg = d3.select("svg");
+
+
+
+function parseLineEast(row){
+	var standings = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	var keys = Object.keys(row)
+	keys.forEach(function(key,i){
+		if (key != "Date"){
+			var team = row[key].split('(')[0].trim()
+			standings[indeces["east"][team]] = i
+		}
+	})
+	row['standings'] = standings
+	return row;
+}
+
+function parseLineWest(row){
+	var standings = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	var keys = Object.keys(row)
+	keys.forEach(function(key,i){
+		if (key != "Date"){
+			var team = row[key].split('(')[0].trim()
+			standings[indeces["west"][team]] = i
+		}
+	})
+	row['standings'] = standings
+	return row;
+}
+
+d3.csv('NBAStandings2020East.csv', parseLineEast, function(error, de) {
+    d3.csv('NBAStandings2020West.csv', parseLineWest, function(error, dw) {
+	    allData = {"east": de, "west": dw};
+	    console.log(allData)
+	    length = de.length;
+	    yScale = d3.scaleLinear()
+			  .domain([1,15])
+              .range([padding, height - padding]);
+
+		xScale = d3.scaleLinear()
+			  .domain([0,length])
+              .range([padding, width - padding]);
+
+	    initial();
+	});
+});
+
+function initial(){
+	y = 0;
+	logos = [];
+	allData[conf][0]['standings'].forEach(function(place,i){
+		var team = teams[conf][i]
+		var pic = svg.append("svg:image")
+	      .attr('x', padding)
+	      .attr('y', yScale(place))
+	      .attr('width', logosize)
+	      .attr('height', logosize)
+	      .attr("xlink:href", "Logos/" + teams[conf][i] + ".png")
+	      .attr("opacity", 1);
+	    logos.push(pic);
+
+	    svg.append("text")
+			.attr("x",padding/2)
+			.attr('y', yScale(i+1) + logosize/2 + 5)
+	        .attr("stroke",'gray')
+	        .attr('font-size','10pt')
+	        .text("" + (i + 1))
+	        .attr('text-anchor','middle')
+
+	})
+
+	svg.append("path")
+			.attr("d", function() {
+	            var d = "M" + xScale(0) + "," + (yScale(8.5) + logosize/2);
+	            d += " " + xScale(length) + "," + (yScale(8.5) + logosize/2);
+	            return d;
+	         })
+			.style("stroke-dasharray", ("3, 3"))
+	        .attr("stroke",'gray')
+	        .attr('stroke-width',2)
+}
+
+function transition(n){
+	var data = allData[conf]
+	for (var i = 0; i < 15; i++){
+		logos[i].transition().duration(200*days).ease(d3.easeLinear) 
+	      .attr('x', xScale(n))
+	      .attr('y', yScale(data[n]['standings'][i]))
+	    if (n > 0){
+	    	totalLength = ((xScale(n)-xScale(n-days))*2 + (yScale((data[n]['standings'][i]))-yScale(data[n-days]['standings'][i]))*2) ^ 0.5
+		  	svg.append("path")
+			.attr("d", function() {
+	            var d = "M" + (xScale(n-days)-5) + "," + (yScale(data[n-days]['standings'][i]) + logosize/2);
+	            d += " " + (xScale(n)-5) + "," + (yScale(data[n]['standings'][i]) + logosize/2);
+	            return d;
+	         })
+	        .attr("stroke-dasharray", totalLength + " " + totalLength)
+	        .attr("stroke-dashoffset", totalLength)
+	        .attr("stroke",w[conf][i] == 2 ? colors[conf][i] : "gray")
+	        .attr('stroke-width',w[conf][i]*1.5)
+	        .attr('opacity',.75)
+	        .transition()
+	          .duration(200*days)
+	          .ease(d3.easeLinear)
+	          .attr("stroke-dashoffset", 0)
+	    }
+	}
+	var date = allData[conf][n]["Date"]; 
+	 if (date.substring(0,2) == "1-" || date.substring(0,2) == "15"){
+      	svg.append('text')
+      		.attr("x",xScale(n))
+			.attr('y',padding/2)
+	        .attr("stroke",'gray')
+	        .attr('font-size','10pt')
+	        .text(date)
+	        .attr('text-anchor','middle')
+      }
+}
+
+var y = 0;
+function show(number) {           //  create a loop function
+   setTimeout(function () {    //  call a 3s setTimeout when the loop is called
+      transition(y);  
+      //document.getElementById("buildings").innerHTML = 
+  //"# of High Rises: " + building_data.filter(function(d) { return d.Year <= i}).length;
+      y += days;                    //  increment the counter
+      if (y < length) {            //  if the counter < 10, call the loop function
+         show();             //  ..  again which will trigger another 
+      }                        //  ..  setTimeout()
+   }, 200*days)
+}
+	
+	
+function changeconf(){
+	if (conf == "east"){
+		conf = "west";
+	} else {
+		conf = "east";
+	}
+	svg.selectAll("*").remove()
+	initial()
+	console.log()
+}
+
+</script>
