@@ -29,6 +29,7 @@ svg {
 #top {
 	text-align: center;
 	margin-bottom: 10px;
+	width: 750px;
 }
 #toggle {
 	background-color: transparent; 
@@ -40,6 +41,19 @@ svg {
 	font-weight:700; 
 	stroke: #343a40
 }
+select{
+	background-color: transparent; 
+	color: black; 
+	text-align: center; 
+	font-size: 16px; 
+	border: 2px solid #343a40; 
+	padding: 5px 5px; 
+	font-weight:700; 
+	stroke: #343a40
+}
+.hidden {
+	display: none;
+}
 #toggle:hover {
 	background-color: grey;
 }
@@ -50,16 +64,38 @@ path.lineGraph {
 </style>
 </head>
 <body>
-<h2> 2020 NBA Season: How Did We Get Here?</h2>
 <div id="top">
+<h2> 2020 NBA Season: How Did We Get Here?</h2>
 	<select id="conf" onchange="changeconf()">
 	  <option value="east">Eastern Conference</option>
 	  <option value="west">Western Conference</option>
 	</select>
-	<button id="toggle" type="button" onclick="show(0)">Click to Animate</button>
+	<select id="highlight-east">
+	  <option value="all">All Playoff Teams</option>
+	  <option value="MIL">Milwaukee Bucks</option>
+	  <option value="TOR">Toronto Raptors</option>
+	  <option value="BOS">Boston Celtics</option>
+	  <option value="MIA">Miami Heat</option>
+	  <option value="IND">Indiana Pacers</option>
+	  <option value="PHI">Philadelphia 76ers</option>
+	  <option value="BRK">Brooklyn Nets</option>
+	  <option value="ORL">Orlando Magic</option>
+	</select>
+	<select id="highlight-west" class="hidden">
+	  <option value="all">All Playoff Teams</option>
+	  <option value="LAL">Los Angeles Lakers</option>
+	  <option value="LAC">Los Angeles Clippers</option>
+	  <option value="DEN">Denver Nuggets</option>
+	  <option value="UTA">Utah Jazz</option>
+	  <option value="HOU">Houston Rockets</option>
+	  <option value="OKC">Oklahoma City Thunder</option>
+	  <option value="DAL">Dallas Mavericks</option>
+	  <option value="MEM">Memphis Grizzlies</option>
+	</select>
+	<button id="toggle" type="button" onclick="anima(0)">Animate</button>
 </div>
 <!-- Here's an SVG element. Note that in this file it looks like the <div> above. -->
-<svg height="500" width="1200">
+<svg height="500" width="750">
   <g id="plot"> 
   </g>
 </svg>
@@ -73,7 +109,7 @@ var allData = {};
 var length;
 var padding = 30;
 var height = 500;
-var width = 1200;
+var width = 750;
 var xScale;
 var yScale;
 var conf = "east"
@@ -177,6 +213,7 @@ function initial(){
 
 function transition(n){
 	var data = allData[conf]
+	var highlight = document.getElementById("highlight-" + conf).value
 	for (var i = 0; i < 15; i++){
 		logos[i].transition().duration(200*days).ease(d3.easeLinear) 
 	      .attr('x', xScale(n))
@@ -191,7 +228,9 @@ function transition(n){
 	         })
 	        .attr("stroke-dasharray", totalLength + " " + totalLength)
 	        .attr("stroke-dashoffset", totalLength)
-	        .attr("stroke",w[conf][i] == 2 ? colors[conf][i] : "gray")
+	        .attr("stroke", highlight == "all" ? 
+	        				(w[conf][i] == 2 ? colors[conf][i] : "gray") : 
+	        				(highlight == teams[conf][i] ? colors[conf][i] : "gray"))
 	        .attr('stroke-width',w[conf][i]*1.5)
 	        .attr('opacity',.75)
 	        .transition()
@@ -201,7 +240,7 @@ function transition(n){
 	    }
 	}
 	var date = allData[conf][n]["Date"]; 
-	 if (date.substring(0,2) == "1-" || date.substring(0,2) == "15"){
+	 if (date.substring(0,2) == "1-"){
       	svg.append('text')
       		.attr("x",xScale(n))
 			.attr('y',padding/2)
@@ -221,20 +260,34 @@ function show(number) {           //  create a loop function
       y += days;                    //  increment the counter
       if (y < length) {            //  if the counter < 10, call the loop function
          show();             //  ..  again which will trigger another 
-      }                        //  ..  setTimeout()
+      }                       //  ..  setTimeout()
+      else {
+      	document.getElementById("toggle").disabled = false;
+      	document.getElementById("conf").disabled = false;
+      }
    }, 200*days)
 }
 	
+function anima(n){
+	document.getElementById("toggle").disabled = true;
+	document.getElementById("conf").disabled = true;
+	svg.selectAll("*").remove();
+	initial();
+	show(0);
+}
 	
 function changeconf(){
 	if (conf == "east"){
 		conf = "west";
+		document.getElementById("highlight-west").classList.remove("hidden")
+		document.getElementById("highlight-east").classList.add("hidden")
 	} else {
 		conf = "east";
+		document.getElementById("highlight-east").classList.remove("hidden")
+		document.getElementById("highlight-west").classList.add("hidden")
 	}
 	svg.selectAll("*").remove()
 	initial()
-	console.log()
 }
 
 </script>
