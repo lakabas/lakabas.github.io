@@ -24,6 +24,7 @@ h2 {
 }
 svg { 
 	border: solid #ccc 1px; 
+	border-radius: 8px;
 	background-color: #f0f0f0;
 }
 #top {
@@ -35,27 +36,32 @@ svg {
 	background-color: transparent; 
 	color: black; 
 	text-align: center; 
-	font-size: 16px; 
+	font-size: 18px; 
 	border: 2px solid #343a40; 
 	padding: 10px 24px; 
 	font-weight:700; 
-	stroke: #343a40
+	stroke: #343a40;
+	border-radius: 8px;
 }
 select{
 	background-color: transparent; 
 	color: black; 
 	text-align: center; 
-	font-size: 16px; 
+	font-size: 12px; 
 	border: 2px solid #343a40; 
-	padding: 5px 5px; 
+	padding: 10px 10px; 
 	font-weight:700; 
-	stroke: #343a40
+	stroke: #343a40;
+	border-radius: 8px;
 }
 .hidden {
 	display: none;
 }
 #toggle:hover {
-	background-color: grey;
+	background-color: gray;
+}
+select:hover{
+	background-color: gray;
 }
 path.lineGraph { 
 		fill: none; 
@@ -115,6 +121,7 @@ var yScale;
 var conf = "east"
 var logosize = 30;
 var days = 1;
+var dates = {"1-Mar-20": "3/1/20", "1-Feb-20": "2/1/20", "1-Jan-20": "1/1/20", "1-Dec-19": "12/1/19", "1-Nov-19": "11/1/19"}
 
 var eastIndeces = {"ATL": 0, "BOS": 1, "CHO": 2, "CHI": 3, "CLE": 4, "DET": 5, "IND": 6, "MIA": 7, "MIL": 8, "BRK": 9, "NYK": 10, "ORL": 11, "PHI": 12, "TOR": 13, "WAS": 14}
 var eastTeams = ["ATL", "BOS", "CHO", "CHI", "CLE", "DET", "IND", "MIA", "MIL", "BRK", "NYK", "ORL", "PHI", "TOR", "WAS"]
@@ -122,7 +129,7 @@ var eastColors = ["#E03A3E","#007A33","#00788C","#CE1141","#860038","#1D42BA","#
 
 var westIndeces = {"DAL": 0, "DEN": 1, "GSW": 2, "HOU": 3, "LAC": 4, "LAL": 5, "MEM": 6, "MIN": 7, "NOP": 8, "OKC": 9, "PHO": 10, "POR": 11, "SAC": 12, "SAS": 13, "UTA": 14}
 var westTeams = ["DAL","DEN","GSW","HOU","LAC","LAL","MEM","MIN","NOP","OKC","PHO","POR","SAC","SAS","UTA"]
-var westColors = ["#00843D","#0E2240","#FFC72C","#CE1141","#1D428A","#552583","#5D76A9","#78BE20","#85714D","#EF3B24","#1D1160","#E03A3E","#5A2D81","#000000","#753BBD"]
+var westColors = ["#00538C","#FEC524","#FFC72C","#000000","#C8102E","#552583","#5D76A9","#78BE20","#85714D","#EF3B24","#1D1160","#E03A3E","#5A2D81","#000000","#00471B"]
 
 var w = {"east":[1,2,1,1,1,1,2,2,2,2,1,2,2,2,1],"west":[2,2,1,2,2,2,2,1,1,2,1,1,1,1,2]}
 var indeces = {"east": eastIndeces, "west": westIndeces}
@@ -197,6 +204,7 @@ function initial(){
 	        .attr('font-size','10pt')
 	        .text("" + (i + 1))
 	        .attr('text-anchor','middle')
+	        .attr('font-weight','bold')
 
 	})
 
@@ -209,6 +217,18 @@ function initial(){
 			.style("stroke-dasharray", ("3, 3"))
 	        .attr("stroke",'gray')
 	        .attr('stroke-width',2)
+	for (var j = 0; j < length; j++){
+		var date = allData[conf][j]["Date"]; 
+		 if (date.substring(0,2) == "1-"){
+	      	svg.append('text')
+	      		.attr("x",xScale(j))
+				.attr('y',padding/2)
+		        .attr("stroke",'gray')
+		        .attr('font-size','10pt')
+		        .text(dates[date])
+		        .attr('text-anchor','middle')
+	      }
+	}
 }
 
 function transition(n){
@@ -239,16 +259,6 @@ function transition(n){
 	          .attr("stroke-dashoffset", 0)
 	    }
 	}
-	var date = allData[conf][n]["Date"]; 
-	 if (date.substring(0,2) == "1-"){
-      	svg.append('text')
-      		.attr("x",xScale(n))
-			.attr('y',padding/2)
-	        .attr("stroke",'gray')
-	        .attr('font-size','10pt')
-	        .text(date)
-	        .attr('text-anchor','middle')
-      }
 }
 
 var y = 0;
