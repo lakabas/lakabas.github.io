@@ -1,6 +1,7 @@
 <html>
 <head>
 <title>NBA Standings Draw</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link href="https://fonts.googleapis.com/css?family=Crimson+Text" rel="stylesheet"><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/styles/default.min.css">
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/highlight.min.js"></script>
@@ -30,13 +31,13 @@ svg {
 #top {
 	text-align: center;
 	margin-bottom: 10px;
-	width: 750px;
+	width: 1240px;
 }
 #toggle {
 	background-color: transparent; 
 	color: black; 
 	text-align: center; 
-	font-size: 18px; 
+	font-size: 20px; 
 	border: 2px solid #343a40; 
 	padding: 10px 24px; 
 	font-weight:700; 
@@ -53,25 +54,55 @@ select{
 	font-weight:700; 
 	stroke: #343a40;
 	border-radius: 8px;
+	margin-left: 5px;
+	margin-right: 5px;
 }
 .hidden {
 	display: none;
-}
-#toggle:hover {
-	background-color: gray;
-}
-select:hover{
-	background-color: gray;
 }
 path.lineGraph { 
 		fill: none; 
 		stroke-width: 2; 
 }
+.tooltip {
+  position: relative;
+  display: inline-block;
+  margin-left: 10px;
+  margin-right: 5px;
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 100px;
+  background-color: grey;
+  color: #fff;
+  font-size:12px;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 0;
+  
+  /* Position the tooltip */
+  position: absolute;
+  z-index: 1;
+  top: 100%;
+  left: 50%;
+  margin-left: -50px;
+  margin-top: 5px;
+}
+select:hover {
+	background-color: grey;
+}
+/*.tooltip:hover .tooltiptext {
+  visibility: visible;
+}*/
+option {
+	background-color: black;
+}
 </style>
 </head>
 <body>
 <div id="top">
-<h2> 2019-20 NBA Season: How Did We Get Here?</h2>
+<h2> 2019-20 NBA Season: League Standings By Date</h2>
 	<select id="conf" onchange="changeconf()">
 	  <option value="east">Eastern Conference</option>
 	  <option value="west">Western Conference</option>
@@ -98,10 +129,13 @@ path.lineGraph {
 	  <option value="DAL">Dallas Mavericks</option>
 	  <option value="MEM">Memphis Grizzlies</option>
 	</select>
-	<button id="toggle" type="button" onclick="anima(0)">Animate</button>
+	<div class="tooltip">
+		<button id="toggle" type="button" onclick="anima(0)">Animate</button>
+		<span class="tooltiptext">Click me!</span>
+	</div>
 </div>
 <!-- Here's an SVG element. Note that in this file it looks like the <div> above. -->
-<svg height="500" width="750">
+<svg height="500" width="1240">
   <g id="plot"> 
   </g>
 </svg>
@@ -115,7 +149,7 @@ var allData = {};
 var length;
 var padding = 30;
 var height = 500;
-var width = 750;
+var width = 1240;
 var xScale;
 var yScale;
 var conf = "east"
