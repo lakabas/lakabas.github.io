@@ -585,6 +585,18 @@ function onClickCircle(l,c,d){
     headercircle.attr('fill',d["Color"]).attr('opacity',1)
     headertext.text(d["Team"]).attr('x',padding + nfllogosize + 10 + d["Total Value Rank"].length * 20)
     headerrank.text(d["Total Value Rank"])
+    svg.select("#TotalValue").text('$' + formatNumber(d["Total Value"]) + 'M')
+    svg.select("#TeamRelated").text('$' + formatNumber(d["Team-Related Businesses and Property"]) + 'M')
+    svg.select("#TeamValue").text('$' + formatNumber(d["Team Value"]) + "M")
+    var splitowner = splittext(d["Principal Owner"],leftsidewidth-padding)
+    svg.select("#PrincipalOwner").text(splitowner[0])
+    svg.select("#PrincipalOwner2").text(splitowner[1])
+    svg.select("#PrincipalOwner3").text(splitowner[2])
+    var split2019 = splittext(d["2019 Season Result"],leftsidewidth-padding)
+    svg.select("#SeasonResult").text(split2019[0])
+    svg.select("#SeasonResult2").text(split2019[1])
+    svg.select("#Championships").text(d["Super Bowl Championships"])
+    svg.select("#Division").text(d["Conference"] + ' ' + d["Division"])
   } else {
     clicked = ""
     c.attr('stroke-width',0)
