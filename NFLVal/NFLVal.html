@@ -1,0 +1,621 @@
+<html>
+<head>
+<title>Sportico's NFL Valuations</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css?family=Crimson+Text" rel="stylesheet"><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/styles/default.min.css">
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/highlight.min.js"></script>
+<style>
+@font-face {
+  font-family: myFirstFont;
+  src: url(Geograph/Geograph-Thin.otf);
+}
+@font-face {
+  font-family: mySecondFont;
+  src: url(Geograph/Geograph-Medium.otf);
+}
+body{
+  font-family:myFirstFont;
+  letter-spacing:0.05em;
+  text-align: center;
+}
+.header {
+  font-family:mySecondFont;
+  letter-spacing:0.05em;
+  text-align: center;
+}
+.leftsidestats {
+  background-color: grey;
+  border-radius: 0px 0px 0px 50px;
+}
+svg { 
+	border: solid black 1px; 
+	border-radius: 0px;
+	background-color: black;
+}
+</style>
+</head>
+<body>
+<svg height="750" width="1000">
+  <g id="plot"> 
+  </g>
+</svg>
+</body>
+
+<script>
+var svg = d3.select("svg");
+var padding = 30;
+var paddingsmall = 20;
+var height = 750;
+var width = 1000;
+
+var nfllogosize = 60;
+var smallcirclesize = 15;
+var headerlogo;
+var headercircle;
+var headertext;
+var headerrank;
+
+var leftsideoffset = padding + nfllogosize + paddingsmall + 2*smallcirclesize + 10 + paddingsmall
+var leftside = svg.append('g')
+                .attr("transform", "translate(" + 0 + "," + (leftsideoffset) + ")")
+var leftsidewidth = 170;
+var rightsidewidth = leftsidewidth + 50;
+var leftsidestatsheight = 250;
+var rightsideheight = 250;
+var rightside = svg.append('g')
+                .attr("transform", "translate(" + (width - rightsidewidth - paddingsmall) + "," + (leftsideoffset + 50) + ")")
+
+var cx = (width + leftsidewidth) / 2 - rightsidewidth / 3
+var cy = (height + leftsideoffset) / 2 
+var rad = 30;
+var maxLength = cx - leftsideoffset;
+var lengthScale = d3.scaleLinear()
+              .domain([0,6325])
+              .range([0,maxLength]);
+var radScale = d3.scaleSqrt()
+              .domain([0,6325])
+              .range([0,rad]);
+var groups = [];
+var sortable = "Alpha Rank"
+
+var alldata;
+
+var clickedcircle;
+var clickedlogo;
+var clicked = "";
+
+function parseLine(row){
+  row['Total Value'] = Number(row['Total Value'])
+  row['Total Value Rank No'] = Number(row['Total Value Rank No']) - 1
+  row['Team-Related Businesses and Property'] = Number(row['Team-Related Businesses and Property'])
+  row['Team Value'] = Number(row['Team Value'])
+  row['Total Revenue'] = Number(row['Total Revenue'])
+  row['National Revenue'] = Number(row['National Revenue'])
+  row['Local Revenue'] = Number(row['Local Revenue'])
+  row['Alpha Rank'] = Number(row['Alpha Rank']) - 1
+  row['Team Revenue Rank'] = Number(row['Team Revenue Rank']) - 1
+  row['Super Bowl Championships Rank No'] = Number(row['Super Bowl Championships Rank No']) - 1
+  return row;
+}
+
+d3.csv('NFLValuations.csv', parseLine, function(error, data) {
+    console.log(data)
+    alldata = data;
+    initial();
+});
+
+function headerInitial(){
+  headercircle = svg.append("circle")
+    .attr('cx', padding + nfllogosize/2)
+    .attr('cy', padding + nfllogosize/4)
+    .attr('r',.55*nfllogosize)
+    .attr("fill",'none')
+    .attr("opacity", 0);
+
+  headerlogo = svg.append("svg:image")
+    .attr('x', padding)
+    .attr('y', padding - nfllogosize/4)
+    .attr('width', nfllogosize)
+    .attr('height', nfllogosize)
+    .attr("xlink:href", "NFLlogo.png")
+    .attr("opacity", 1);
+
+  headertext = svg.append('text')
+    .attr('class',"header")
+    .attr('x',padding + nfllogosize + 10)
+    .attr('y',padding + 3 * nfllogosize/8)
+    .attr("stroke",'white')
+    .attr('fill','white')
+    .attr('font-size','20pt')
+    .text("NFL Franchise Valuations")
+
+    headerrank = svg.append('text')
+    .attr('x',padding + nfllogosize + 10)
+    .attr('y',padding + 3 * nfllogosize/8)
+    .attr("stroke",'white')
+    .attr('fill','white')
+    .attr('font-size','20pt')
+    .text("")
+
+    svg.append('text')
+    .attr('x',padding)
+    .attr('y',padding + nfllogosize + 10)
+    .attr("stroke",'#4a4a4a')
+    .attr('font-size','8pt')
+    .text("Sort By")
+    svg.append('rect')
+    .attr('x',padding)
+    .attr('y',padding + nfllogosize + 20)
+    .attr('height',15)
+    .attr('width',50)
+    .attr("fill",'#4a4a4a')
+    .on('click', function(){
+      sortBy("Total Value Rank No")
+    })
+    svg.append('text')
+    .attr('x',padding + 5)
+    .attr('y',padding + nfllogosize + 30)
+    .attr("stroke",'white')
+    .attr('font-size','7pt')
+    .text("Value")
+    svg.append('rect')
+    .attr('x',padding + 60)
+    .attr('y',padding + nfllogosize + 20)
+    .attr('height',15)
+    .attr('width',50)
+    .attr("fill",'#4a4a4a')
+    .on('click', function(){
+      sortBy("Team Revenue Rank")
+    })
+    svg.append('text')
+    .attr('x',padding + 65)
+    .attr('y',padding + nfllogosize + 30)
+    .attr("stroke",'white')
+    .attr('font-size','7pt')
+    .text("Revenue")
+    svg.append('rect')
+    .attr('x',padding + 120)
+    .attr('y',padding + nfllogosize + 20)
+    .attr('height',15)
+    .attr('width',75)
+    .attr("fill",'#4a4a4a')
+    .on('click', function(){
+      sortBy("Super Bowl Championships Rank No")
+    })
+    svg.append('text')
+    .attr('x',padding + 125)
+    .attr('y',padding + nfllogosize + 30)
+    .attr("stroke",'white')
+    .attr('font-size','7pt')
+    .text("Super Bowls")
+}
+
+function leftsideInitial(){
+
+// background
+  function rightRoundedRect(x, y, width, height, radius) {
+    return "M" + x + "," + y
+         + "h" + (width - radius)
+         + "a" + radius + "," + radius + " 0 0 1 " + radius + "," + radius
+         + "v" + (height - radius)
+         + "h" + (-width)
+         + "z";
+  }
+
+  leftside.append('path')
+    .attr('class','leftsidestats')
+    .attr('d',rightRoundedRect(0,0,leftsidewidth,leftsidestatsheight,30))
+    .attr('fill','#2a2a2a')
+  leftside.append('rect')
+    .attr('class','leftsideinfo')
+    .attr('x',0)
+    .attr('y',leftsidestatsheight)
+    .attr('width',leftsidewidth)
+    .attr('height',height - leftsideoffset - leftsidestatsheight)
+    .attr('fill','#1d1d1d')
+
+// upper section
+  var circlesize = 4
+  var spacing = 75
+
+  leftside.append('text')
+    .attr('x',padding)
+    .attr('y',padding)
+    .text("Total Value")
+    .attr('font-size','10pt')
+    .attr('stroke','#4a4a4a')
+  leftside.append('circle')
+    .attr('cx',padding + circlesize)
+    .attr('cy',padding + 21)
+    .attr('r',circlesize)
+    .attr('fill','red')
+  leftside.append('text')
+    .attr('x',padding + 15)
+    .attr('y',padding + 28)
+    .attr('id',"TotalValue")
+    .text("-")
+    .attr('font-size','16pt')
+    .attr('stroke','white')
+
+  leftside.append('text')
+    .attr('x',padding)
+    .attr('y',padding + spacing)
+    .text("Team-Related")
+    .attr('font-size','10pt')
+    .attr('stroke','#4a4a4a')
+  leftside.append('text')
+    .attr('x',padding)
+    .attr('y',padding + spacing + 15)
+    .text("Businesses")
+    .attr('font-size','10pt')
+    .attr('stroke','#4a4a4a')
+  leftside.append('text')
+    .attr('x',padding)
+    .attr('y',padding + spacing + 30)
+    .text("And Property")
+    .attr('font-size','10pt')
+    .attr('stroke','#4a4a4a')
+  leftside.append('circle')
+    .attr('cx',padding + circlesize)
+    .attr('cy',padding + spacing + 30 + 21)
+    .attr('r',circlesize)
+    .attr('fill','yellow')
+  leftside.append('text')
+    .attr('x',padding + 15)
+    .attr('y',padding + spacing + 30 + 28)
+    .attr('id',"TeamRelated")
+    .text("-")
+    .attr('font-size','16pt')
+    .attr('stroke','white')
+
+  leftside.append('text')
+    .attr('x',padding)
+    .attr('y',padding + 30 + spacing * 2)
+    .text("Team Value")
+    .attr('font-size','10pt')
+    .attr('stroke','#4a4a4a')
+  leftside.append('circle')
+    .attr('cx',padding + circlesize)
+    .attr('cy',padding + 30 + spacing * 2 + 21)
+    .attr('r',circlesize)
+    .attr('fill','#15c9ed')
+  leftside.append('text')
+    .attr('x',padding + 15)
+    .attr('y',padding + 30 + spacing * 2 + 28)
+    .attr('id',"TeamValue")
+    .text("-")
+    .attr('font-size','16pt')
+    .attr('stroke','white')
+
+
+// lower section
+  leftside.append('text')
+    .attr('x',padding)
+    .attr('y',leftsidestatsheight + padding)
+    .text("Principal Owner")
+    .attr('font-size','10pt')
+    .attr('stroke','#4a4a4a')
+  leftside.append('text')
+    .attr('x',padding)
+    .attr('y',leftsidestatsheight + padding + 25)
+    .attr('id',"PrincipalOwner")
+    .text("-")
+    .attr('font-size','10pt')
+    .attr('stroke','white')
+  leftside.append('text')
+    .attr('x',padding)
+    .attr('y',leftsidestatsheight + padding + 40)
+    .attr('id',"PrincipalOwner2")
+    .text("")
+    .attr('font-size','10pt')
+    .attr('stroke','white')
+  leftside.append('text')
+    .attr('x',padding)
+    .attr('y',leftsidestatsheight + padding + 55)
+    .attr('id',"PrincipalOwner3")
+    .text("")
+    .attr('font-size','10pt')
+    .attr('stroke','white')
+
+  leftside.append('text')
+    .attr('x',padding)
+    .attr('y',leftsidestatsheight + padding + spacing)
+    .text("2019 Season Result")
+    .attr('font-size','10pt')
+    .attr('stroke','#4a4a4a')
+  leftside.append('text')
+    .attr('x',padding)
+    .attr('y',leftsidestatsheight + padding + spacing + 25)
+    .attr('id',"SeasonResult")
+    .text("-")
+    .attr('font-size','10pt')
+    .attr('stroke','white')
+  leftside.append('text')
+    .attr('x',padding)
+    .attr('y',leftsidestatsheight + padding + spacing + 40)
+    .attr('id',"SeasonResult2")
+    .text("")
+    .attr('font-size','10pt')
+    .attr('stroke','white')
+
+  leftside.append('text')
+    .attr('x',padding)
+    .attr('y',leftsidestatsheight + padding + spacing * 2)
+    .text("Super Bowl")
+    .attr('font-size','10pt')
+    .attr('stroke','#4a4a4a')
+  leftside.append('text')
+    .attr('x',padding)
+    .attr('y',leftsidestatsheight + padding + spacing * 2 + 15)
+    .text("Championships")
+    .attr('font-size','10pt')
+    .attr('stroke','#4a4a4a')
+  leftside.append('text')
+    .attr('x',padding)
+    .attr('y',leftsidestatsheight + padding + spacing * 2 + 15 + 25)
+    .attr('id',"Championships")
+    .text("-")
+    .attr('font-size','10pt')
+    .attr('stroke','white')
+
+  leftside.append('text')
+    .attr('x',padding)
+    .attr('y',leftsidestatsheight + padding + spacing * 3 + 15)
+    .text("Division")
+    .attr('font-size','10pt')
+    .attr('stroke','#4a4a4a')
+  leftside.append('text')
+    .attr('x',padding)
+    .attr('y',leftsidestatsheight + padding + spacing * 3 + 15 + 25)
+    .attr('id',"Division")
+    .text("-")
+    .attr('font-size','10pt')
+    .attr('stroke','white')
+    
+}
+
+function rightsideInitial(){
+
+   rightside.append('rect')
+    .attr('class','rightsidestats')
+    .attr('x',0)
+    .attr('y',0)
+    .attr('width',rightsidewidth)
+    .attr('height',rightsideheight)
+    .attr('rx','30px')
+    .attr('stroke','#4a4a4a')
+    .attr('stroke-width',2)
+
+  rightside.append('text')
+    .attr('x',padding)
+    .attr('y',padding)
+    .text("Total Revenue")
+    .attr('font-size','10pt')
+    .attr('stroke','#4a4a4a')
+  rightside.append('text')
+    .attr('x',padding + 15)
+    .attr('y',padding + 25)
+    .text("-")
+    .attr('font-size','16pt')
+    .attr('stroke','white')
+}
+
+function graphInitial(){
+
+  alldata.forEach(function(franchise,i){
+    var rand = Math.random() - .5;
+    var angle = 360 * franchise['Alpha Rank']/32 + rand * 2 + 37
+    var g = svg.append('g')
+    .attr('transform','rotate(' + angle + ',' + cx + "," + cy + ')')
+    //.attr('transform','rotate(' + (360 * i/32) + ',' + cx + "," + cy + ')')
+
+    g.append("path")
+      .attr("d", function() {
+          var d = "M" + cx + "," + cy;
+          d += " " + cx + "," + (cy - lengthScale(franchise["Total Value"]) - rad);
+          return d;
+      })     
+      .attr("stroke", '#4a4a4a')
+      .attr('stroke-width',.5)
+      .attr('opacity',.75)
+
+    var colorcircle = g.append('circle')
+      .attr('cx',cx)
+      .attr('cy',cy - lengthScale(franchise["Total Value"]) - rad - radScale(franchise["Total Value"]))
+      .attr('r',radScale(franchise["Total Value"]))
+      .attr('fill',franchise["Color"])
+
+      var logo = g.append('svg:image')
+        .attr('class','logo')
+        .attr('x',cx - radScale(franchise["Total Value"]) * 1/1.414)
+        .attr('y',cy - lengthScale(franchise["Total Value"]) - rad - radScale(franchise["Total Value"]) - radScale(franchise["Total Value"]) * 1/1.414)
+        .attr('width',radScale(franchise["Total Value"]) * 2/1.414)
+        .attr('height',radScale(franchise["Total Value"]) * 2/1.414)
+        .attr("xlink:href", "Logos/" + franchise["Team"] + ".png")
+        .style("pointer-events", "none")
+        .attr('transform','rotate(' + (-angle) + ',' 
+                                    + (cx) + "," 
+                                    + (cy - lengthScale(franchise["Total Value"]) - rad - radScale(franchise["Total Value"])) + ')')  
+
+      colorcircle.on("mouseover",function(){
+            onMouseoverCircle(logo, colorcircle,franchise)
+      })
+      .on("mouseout",function(){
+            onMouseoutCircle(logo, colorcircle,franchise)
+      })
+      .on("click",function(){
+            onClickCircle(logo, colorcircle,franchise)
+      })
+
+      groups.push(g)
+
+    })
+    
+    svg.append('circle')
+      .attr('cx',cx)
+      .attr('cy',cy)
+      .attr('r',rad)
+      .attr('fill','black ')
+
+  }
+
+function initial(){
+  headerInitial();
+  leftsideInitial();
+  rightsideInitial();
+  graphInitial();
+}
+
+function onMouseoverCircle(l,c,d){
+  if (clicked == ""){
+    l.attr('x',cx - (rad+5) * 1/1.414)
+      .attr('y',cy - lengthScale(d["Total Value"]) - rad - (radScale(d["Total Value"])) - (rad+5) * 1/1.414)
+      .attr('height',(rad + 5) * 2/1.414)
+      .attr('width',(rad + 5) * 2/1.414)
+    c.attr('r',rad + 5)
+
+    headerlogo.attr("xlink:href", "Logos/" + d["Team"] + ".png")
+    headercircle.attr('fill',d["Color"]).attr('opacity',1)
+    headertext.text(d["Team"]).attr('x',padding + nfllogosize + 10 + d["Total Value Rank"].length * 20)
+    headerrank.text(d["Total Value Rank"])
+
+    svg.select("#TotalValue").text('$' + formatNumber(d["Total Value"]) + 'M')
+    svg.select("#TeamRelated").text('$' + formatNumber(d["Team-Related Businesses and Property"]) + 'M')
+    svg.select("#TeamValue").text('$' + formatNumber(d["Team Value"]) + "M")
+    var splitowner = splittext(d["Principal Owner"],leftsidewidth-padding)
+    svg.select("#PrincipalOwner").text(splitowner[0])
+    svg.select("#PrincipalOwner2").text(splitowner[1])
+    svg.select("#PrincipalOwner3").text(splitowner[2])
+    var split2019 = splittext(d["2019 Season Result"],leftsidewidth-padding)
+    svg.select("#SeasonResult").text(split2019[0])
+    svg.select("#SeasonResult2").text(split2019[1])
+    svg.select("#Championships").text(d["Super Bowl Championships"])
+    svg.select("#Division").text(d["Conference"] + ' ' + d["Division"])
+  } 
+  else if (clicked != d["Team"]){
+    l.attr('x',cx - (rad+5) * 1/1.414)
+      .attr('y',cy - lengthScale(d["Total Value"]) - rad - (radScale(d["Total Value"])) - (rad+5) * 1/1.414)
+      .attr('height',(rad + 5) * 2/1.414)
+      .attr('width',(rad + 5) * 2/1.414)
+    c.attr('r',rad + 5)
+  }
+}
+
+function splittext(text,w){
+  var splitowner = text.split(" ")
+  var maxchars = w/10
+  var owner1 = ""
+  var owner2 = ""
+  var owner3 = ""
+  var i = 0;
+  while (owner1.length < maxchars && i < splitowner.length){
+      owner1 += splitowner[i] + " "
+      i++
+  }
+  while (owner2.length < maxchars && i < splitowner.length){
+    owner2 += splitowner[i] + " "
+    i++
+  }
+  while (owner3.length < maxchars && i < splitowner.length){
+    owner3 += splitowner[i] + " "
+    i++
+  }
+  return([owner1,owner2,owner3])
+}
+
+function onMouseoutCircle(l,c,d){
+  if (clicked == ""){
+    l.attr('x',cx - radScale(d["Total Value"]) * 1/1.414)
+      .attr('y',cy - lengthScale(d["Total Value"]) - rad - radScale(d["Total Value"]) - radScale(d["Total Value"]) * 1/1.414)
+      .attr('height',radScale(d["Total Value"]) * 2/1.414)
+      .attr('width',radScale(d["Total Value"]) * 2/1.414)
+    c.attr('r',radScale(d["Total Value"]))
+
+    headerlogo.attr("xlink:href", "NFLlogo.png")
+    headercircle.attr('fill',d["Color"]).attr('opacity',0)
+    headertext.attr('x',padding + nfllogosize + 10)
+      .text('NFL Franchise Valuations')
+    headerrank.text(' ')
+    svg.select("#TotalValue").text("-")
+    svg.select("#TeamRelated").text("-")
+    svg.select("#TeamValue").text("-")
+    svg.select("#PrincipalOwner").text("-")
+    svg.select("#PrincipalOwner2").text("")
+    svg.select("#PrincipalOwner3").text("")
+    svg.select("#SeasonResult").text("-")
+    svg.select("#SeasonResult2").text("")
+    svg.select("#Championships").text("-")
+    svg.select("#Division").text("-")
+  }
+  else if (clicked != d["Team"]){
+    l.attr('x',cx - radScale(d["Total Value"]) * 1/1.414)
+      .attr('y',cy - lengthScale(d["Total Value"]) - rad - radScale(d["Total Value"]) - radScale(d["Total Value"]) * 1/1.414)
+      .attr('height',radScale(d["Total Value"]) * 2/1.414)
+      .attr('width',radScale(d["Total Value"]) * 2/1.414)
+    c.attr('r',radScale(d["Total Value"]))
+  }
+}
+
+function onClickCircle(l,c,d){
+  if (clicked == ""){
+    clicked = d["Team"]
+    clickedcircle = c;
+    clickedlogo = l;
+    c.attr('stroke-width',2)
+    .attr('stroke','white')
+  }
+  else if (clicked != d["Team"]){
+    var t = alldata.filter(function(team){
+      return team["Team"] == clicked;
+    })[0]
+    clickedcircle.attr('stroke-width',0)
+    .attr('r',radScale(t["Total Value"]))
+    clickedlogo.attr('x',cx - radScale(t["Total Value"]) * 1/1.414)
+      .attr('y',cy - lengthScale(t["Total Value"]) - rad - radScale(t["Total Value"]) - radScale(t["Total Value"]) * 1/1.414)
+      .attr('height',radScale(t["Total Value"]) * 2/1.414)
+      .attr('width',radScale(t["Total Value"]) * 2/1.414)
+
+    clicked = d["Team"]
+    clickedcircle = c;
+    clickedlogo = l;
+    c.attr('stroke-width',2)
+    .attr('stroke','white')
+    headerlogo.attr("xlink:href", "Logos/" + d["Team"] + ".png")
+    headercircle.attr('fill',d["Color"]).attr('opacity',1)
+    headertext.text(d["Team"]).attr('x',padding + nfllogosize + 10 + d["Total Value Rank"].length * 20)
+    headerrank.text(d["Total Value Rank"])
+  } else {
+    clicked = ""
+    c.attr('stroke-width',0)
+    clickedcircle = undefined;
+    clickedlogo = undefined;
+  }
+}
+
+function formatNumber(num) {
+  return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
+}
+
+function sortBy(variable){
+  groups.forEach(function(gp,i){
+    var franchise = alldata[i];
+    var rand = Math.random() - .5;
+    var angle = 360 * franchise[variable]/32 + rand * 2
+    var prevangle = 360 * franchise[sortable]/32 + (sortable == "Alpha Rank" ? 37 : 0)
+    gp
+    .transition()
+    .duration(3000)
+    .attrTween('transform' ,  function(){ return d3.interpolateString( "rotate(" + prevangle + "," + cx + "," + cy + ")", "rotate(" + angle + "," + cx + "," + cy + ")" ) })
+
+    gp.select('.logo')
+    .transition()
+    .duration(3000)
+    .attrTween('transform' ,  function(){ return d3.interpolateString( "rotate(" + -prevangle + "," + cx + "," + (cy - lengthScale(franchise["Total Value"]) - rad - radScale(franchise["Total Value"])) + ")", "rotate(" + -angle + "," + cx + "," + (cy - lengthScale(franchise["Total Value"]) - rad - radScale(franchise["Total Value"])) + ")" ) })
+  })
+
+  sortable = variable;
+}
+
+</script>
+</html>
