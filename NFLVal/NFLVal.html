@@ -1,0 +1,1255 @@
+<html>
+<head>
+<title>Sportico's NFL Valuations</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css?family=Crimson+Text" rel="stylesheet"><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/styles/default.min.css">
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/highlight.min.js"></script>
+<style>
+@font-face {
+  font-family: myFirstFont;
+  src: url(Geograph/Geograph-Thin.otf);
+}
+@font-face {
+  font-family: mySecondFont;
+  src: url(Geograph/Geograph-Medium.otf);
+}
+body{
+  font-family:myFirstFont;
+  letter-spacing:0.05em;
+  text-align: center;
+}
+.header {
+  font-family:mySecondFont;
+  letter-spacing:0.05em;
+  text-align: center;
+}
+.leftsidestats {
+  background-color: grey;
+  border-radius: 0px 0px 0px 50px;
+}
+#top{
+  background-color: black;
+}
+svg { 
+	border: solid black 1px; 
+	border-radius: 0px;
+	background-color: black;
+}
+</style>
+</head>
+<body>
+<svg height="780" width="1000">
+  <g id="plot"> 
+  </g>
+</svg>
+</body>
+
+<script>
+var svg = d3.select("svg");
+var padding = 24;
+var paddingsmall = 16;
+var height = 780;
+var width = 1000;
+
+var nfllogosize = 48;
+var smallcirclesize = 12;
+var headerlogo;
+var headercircle;
+var headertext;
+var headerrank;
+
+var leftsideoffset = padding + nfllogosize + 2*padding //+ 2*smallcirclesize + 2*padding + 30
+var leftside = svg.append('g')
+                .attr("transform", "translate(" + 0 + "," + (leftsideoffset) + ")")
+var leftsidewidth = 144;
+var rightsidewidth = leftsidewidth + 120;
+var leftsidestatsheight = 220;
+var rightsideheight = 200;
+var rightside = svg.append('g')
+                .attr("transform", "translate(" + (width - rightsidewidth - paddingsmall) + "," + (leftsideoffset) + ")")
+
+var rad = 24;
+var cx = (width - 80) / 2
+var cy = (height + leftsideoffset) / 2 + rad 
+var maxLength = cy - leftsideoffset;
+var lengthScale = d3.scaleLinear()
+              .domain([0,6325])
+              .range([0,maxLength]);
+var radScale = d3.scaleSqrt()
+              .domain([0,6325])
+              .range([0,rad]);
+var widthScale = d3.scaleLinear()
+              .domain([0,857])
+              .range([0,rightsidewidth - 2*paddingsmall]);
+var arcG = svg.append("g")
+          .attr("transform", "translate(" + (cx) + "," + (cy) + ")");
+var arc = d3.arc()
+    .innerRadius(rad + lengthScale(1000)) 
+    .outerRadius(rad + lengthScale(1000) + 20);
+var pie = d3.pie()
+      .startAngle(-5 * Math.PI/180)
+      .endAngle(-5 * Math.PI/180 + 2*Math.PI)
+      .value(function(d) { return d.value; })
+      .padAngle(.03)
+      .sort(null);
+var groups = [];
+var circles = {};
+var logos = {};
+var sortable = "Initial Rank"
+
+var alldata;
+
+var clickedcircle;
+var clickedlogo;
+var clicked = "";
+var hover = "";
+var sorted = "TotalValue";
+
+function parseLine(row){
+  row['Total Value'] = Number(row['Total Value'])
+  row['Total Value Rank No'] = Number(row['Total Value Rank No']) - 1
+  row['Team-Related Businesses and Property'] = Number(row['Team-Related Businesses and Property'])
+  row['Team Value'] = Number(row['Team Value'])
+  row['Total Revenue'] = Number(row['Total Team Revenue'])
+  row['National Revenue'] = Number(row['National Revenue'])
+  row['Local Revenue'] = Number(row['Local Revenue'])
+  row['Initial Rank'] = Number(row['Initial Rank']) - 1
+  row['Team Revenue Rank No'] = Number(row['Team Revenue Rank No']) - 1
+  row['Super Bowl Championships Rank No'] = Number(row['Super Bowl Championships Rank No']) - 1
+  return row;
+}
+
+d3.csv('NFLValuations.csv', parseLine, function(error, data) {
+    console.log(data)
+    alldata = data;
+    initial();
+    setTimeout(function(){ sortBy("Total Value Rank No"); }, 1000);
+});
+
+function headerInitial(){
+  headercircle = svg.append("circle")
+    .attr('cx', padding + nfllogosize/2)
+    .attr('cy', padding + nfllogosize/4)
+    .attr('r',.55*nfllogosize)
+    .attr("fill",'none')
+    .attr("opacity", 0);
+
+  headerlogo = svg.append("svg:image")
+    .attr('x', padding)
+    .attr('y', padding - nfllogosize/4)
+    .attr('width', nfllogosize)
+    .attr('height', nfllogosize)
+    .attr("xlink:href", "NFLlogo.png")
+    .attr("opacity", 1);
+
+  headertext = svg.append('text')
+    .attr('class',"header")
+    .attr('x',padding + nfllogosize + 8)
+    .attr('y',padding + 3 * nfllogosize/8)
+    .attr("stroke",'white')
+    .attr('fill','white')
+    .attr('font-size','16pt')
+    .text("NFL Franchise Valuations")
+
+    headerrank = svg.append('text')
+    .attr('x',padding + nfllogosize + 25)
+    .attr('y',padding + 3 * nfllogosize/8)
+    .attr("stroke",'white')
+    .attr('fill','white')
+    .attr('font-size','16pt')
+    .text("")
+
+    svg.append('text')
+    .attr('x',padding)
+    .attr('y',padding + nfllogosize + paddingsmall)
+    .attr("stroke",'#6a6a6a')
+    .attr('font-size','7pt')
+    .text("Sort By")
+    svg.append('rect')
+    .attr('x',padding + 40)
+    .attr('y',padding + nfllogosize + 6)
+    .attr('height',16)
+    .attr('width',64)
+    .attr("fill",'#1d1d1d')
+    .attr('id','TotalValueSort')
+    .attr('rx',3)
+    .on('click', function(){
+      if (sorted != "TotalValue"){
+        sortBy("Total Value Rank No")
+        d3.select('#' + sorted + "Sort").attr('fill','#1d1d1d')
+        sorted = "TotalValue"
+      }
+    })
+    .on('mouseover', function(){
+      d3.select(this).attr("fill",'#6a6a6a')
+    })
+    .on('mouseout', function(){
+      if (sorted != "TotalValue"){
+        d3.select(this).attr("fill",'#1d1d1d')
+      }
+    })
+    svg.append('text')
+    .attr('x',padding + 72)
+    .attr('y',padding + nfllogosize + paddingsmall)
+    .attr("stroke",'white')
+    .attr('font-size','7pt')
+    .attr('text-anchor','middle')
+    .style("pointer-events", "none")
+    .text("Total Value")
+    svg.append('rect')
+    .attr('x',padding + 108)
+    .attr('y',padding + nfllogosize + 6)
+    .attr('height',16)
+    .attr('width',64)
+    .attr("fill",'#1d1d1d')
+    .attr('id','TeamRevenueSort')
+    .attr('rx',2)
+    .on('click', function(){
+      if (sorted != "TeamRevenue"){
+        sortBy("Team Revenue Rank No")
+        d3.select('#' + sorted + "Sort").attr('fill','#1d1d1d')
+        sorted = "TeamRevenue"
+      }
+    })
+    .on('mouseover', function(){
+      d3.select(this).attr("fill",'#6a6a6a')
+    })
+    .on('mouseout', function(){
+      if (sorted != "TeamRevenue"){
+        d3.select(this).attr("fill",'#1d1d1d')
+      }
+    })
+    svg.append('text')
+    .attr('x',padding + 140)
+    .attr('y',padding + nfllogosize + paddingsmall)
+    .attr("stroke",'white')
+    .attr('font-size','7pt')
+    .attr('text-anchor','middle')
+    .style("pointer-events", "none")
+    .text("Revenue")
+    svg.append('rect')
+    .attr('x',padding + 176)
+    .attr('y',padding + nfllogosize + 6)
+    .attr('height',16)
+    .attr('width',64)
+    .attr("fill",'#1d1d1d')
+    .attr('id','SuperBowlChampionshipsSort')
+    .attr('rx',2)
+    .on('click', function(){
+      if (sorted != "SuperBowlChampionships"){
+        sortBy("Super Bowl Championships Rank No")
+        d3.select('#' + sorted + "Sort").attr('fill','#1d1d1d')
+        sorted = "SuperBowlChampionships"
+      }
+    })
+    .on('mouseover', function(){
+      d3.select(this).attr("fill",'#6a6a6a')
+    })
+    .on('mouseout', function(){
+      if (sorted != "SuperBowlChampionships"){
+        d3.select(this).attr("fill",'#1d1d1d')
+      }
+    })
+    svg.append('text')
+    .attr('x',padding + 208)
+    .attr('y',padding + nfllogosize + paddingsmall)
+    .attr("stroke",'white')
+    .attr('font-size','7pt')
+    .attr('text-anchor','middle')
+    .style("pointer-events", "none")
+    .text("Super Bowls")
+}
+
+function circlesInitial(){
+
+    svg.append('text')
+      .attr('x',padding)
+      .attr('y',padding + nfllogosize + padding*2 - 5)
+      .attr("stroke",'#6a6a6a')
+      .attr('font-size','7pt')
+      .attr('text-anchor','left')
+      .attr('opacity',1)
+      .text("<< Most Valuable")
+    svg.append('text')
+      .attr('x',width - padding)
+      .attr('y',padding + nfllogosize + padding*4)
+      .attr("stroke",'#6a6a6a')
+      .attr('font-size','7pt')
+      .attr('text-anchor','right')
+      .attr('opacity',1)
+      .text("Less Valuable >>")
+
+    svg.selectAll('rowcircles')
+      .data(alldata)
+      .enter()
+      .append('circle')
+      .attr('cx',function(d){
+        return padding+smallcirclesize + (width-smallcirclesize-padding) * (d['Initial Rank'] % 16) / 16;
+      })
+      .attr('cy',function(d){
+        return padding + nfllogosize + padding*2 + 15 + (d['Initial Rank'] >= 16 ? padding*1.5 : 0)
+      })
+      .attr('r', smallcirclesize)
+      .attr('class','rowcircles')
+      .attr('fill', function(d){
+        return d['Color']
+      })
+
+    svg.selectAll('rowlogos')
+      .data(alldata)
+      .enter()
+      .append('svg:image')
+      .attr('x',function(d){
+        return padding+smallcirclesize + (width-smallcirclesize-padding) * (d['Initial Rank'] % 16) / 16 - smallcirclesize * 1/1.414
+      })
+      .attr('y',function(d){
+        return padding + nfllogosize + padding*2 + 15 - smallcirclesize * 1/1.414 + (d['Initial Rank'] >= 16 ? padding*1.5 : 0)
+      }) 
+      .attr('width',smallcirclesize * 2/1.414)
+      .attr('height',smallcirclesize * 2/1.414)
+      .attr('class','rowlogos')
+      .attr("xlink:href", function(d){
+        return "Logos/" + d["Team"] + ".png"
+      })
+      .style("pointer-events", "none")
+}
+
+function leftsideInitial(){
+
+// background
+  function rightRoundedRect(x, y, width, height, radius) {
+    return "M" + x + "," + y
+         + "h" + (width - radius)
+         + "a" + radius + "," + radius + " 0 0 1 " + radius + "," + radius
+         + "v" + (height - radius)
+         + "h" + (-width)
+         + "z";
+  }
+
+  leftside.append('path')
+    .attr('class','leftsidestats')
+    .attr('d',rightRoundedRect(0,0,leftsidewidth,leftsidestatsheight,24))
+    .attr('fill','#2a2a2a')
+  leftside.append('rect')
+    .attr('class','leftsideinfo')
+    .attr('x',0)
+    .attr('y',leftsidestatsheight)
+    .attr('width',leftsidewidth)
+    .attr('height',height - leftsideoffset - leftsidestatsheight)
+    .attr('fill','#1d1d1d')
+
+// upper section
+  var circlesize = 3.2
+  var spacing = 60
+
+  leftside.append('text')
+    .attr('x',padding)
+    .attr('y',padding)
+    .text("Total Value")
+    .attr('font-size','8pt')
+    .attr('stroke','#6a6a6a')
+  leftside.append('circle')
+    .attr('cx',padding + circlesize)
+    .attr('cy',padding + 21)
+    .attr('r',circlesize)
+    .attr('fill','red')
+  leftside.append('text')
+    .attr('x',padding + 15)
+    .attr('y',padding + 26)
+    .attr('id',"TotalValue")
+    .text("-")
+    .attr('font-size','11pt')
+    .attr('stroke','white')
+
+  leftside.append('text')
+    .attr('x',padding)
+    .attr('y',padding + spacing)
+    .text("Team-Related")
+    .attr('font-size','8pt')
+    .attr('stroke','#6a6a6a')
+  leftside.append('text')
+    .attr('x',padding)
+    .attr('y',padding + spacing + 15)
+    .text("Businesses")
+    .attr('font-size','8pt')
+    .attr('stroke','#6a6a6a')
+  leftside.append('text')
+    .attr('x',padding)
+    .attr('y',padding + spacing + 30)
+    .text("And Real-Estate")
+    .attr('font-size','8pt')
+    .attr('stroke','#6a6a6a')
+  leftside.append('circle')
+    .attr('cx',padding + circlesize)
+    .attr('cy',padding + spacing + 30 + 21)
+    .attr('r',circlesize)
+    .attr('fill','yellow')
+  leftside.append('text')
+    .attr('x',padding + 15)
+    .attr('y',padding + spacing + 30 + 26)
+    .attr('id',"TeamRelated")
+    .text("-")
+    .attr('font-size','11pt')
+    .attr('stroke','white')
+  leftside.append('text')
+    .attr('x',padding + 15)
+    .attr('y',padding + spacing + 30 + 22)
+    .attr('id',"TeamRelatedDefault1")
+    .text("Included in")
+    .attr('font-size','7pt')
+    .attr('stroke','white')
+    .attr('opacity',0)
+  leftside.append('text')
+    .attr('x',padding + 15)
+    .attr('y',padding + spacing + 30 + 34)
+    .attr('id',"TeamRelatedDefault2")
+    .text("Team Value")
+    .attr('font-size','7pt')
+    .attr('stroke','white')
+    .attr('opacity',0)
+
+  leftside.append('text')
+    .attr('x',padding)
+    .attr('y',padding + 30 + spacing * 2)
+    .text("Team Value")
+    .attr('font-size','8pt')
+    .attr('stroke','#6a6a6a')
+  leftside.append('circle')
+    .attr('cx',padding + circlesize)
+    .attr('cy',padding + 30 + spacing * 2 + 21)
+    .attr('r',circlesize)
+    .attr('fill','#15c9ed')
+  leftside.append('text')
+    .attr('x',padding + 15)
+    .attr('y',padding + 30 + spacing * 2 + 26)
+    .attr('id',"TeamValue")
+    .text("-")
+    .attr('font-size','11pt')
+    .attr('stroke','white')
+
+
+// lower section
+subspacing = 30;
+
+  leftside.append('text')
+    .attr('x',padding)
+    .attr('y',leftsidestatsheight + padding + subspacing*6.5 + 15)
+    .text("Principal Owner")
+    .attr('font-size','8pt')
+    .attr('stroke','#6a6a6a')
+  leftside.append('text')
+    .attr('x',padding)
+    .attr('y',leftsidestatsheight + padding + subspacing*6.5 + 15 + 20)
+    .attr('id',"PrincipalOwner")
+    .text("-")
+    .attr('font-size','8pt')
+    .attr('stroke','white')
+  leftside.append('text')
+    .attr('x',padding)
+    .attr('y',leftsidestatsheight + padding + subspacing*6.5 + 15 + 35)
+    .attr('id',"PrincipalOwner2")
+    .text("")
+    .attr('font-size','8pt')
+    .attr('stroke','white')
+  leftside.append('text')
+    .attr('x',padding)
+    .attr('y',leftsidestatsheight + padding + subspacing*6.5 + 15 + 50)
+    .attr('id',"PrincipalOwner3")
+    .text("")
+    .attr('font-size','8pt')
+    .attr('stroke','white')
+
+  leftside.append('text')
+    .attr('x',padding)
+    .attr('y',leftsidestatsheight + padding + subspacing*4 + 15)
+    .text("2019 Season Result")
+    .attr('font-size','8pt')
+    .attr('stroke','#6a6a6a')
+  leftside.append('text')
+    .attr('x',padding)
+    .attr('y',leftsidestatsheight + padding + subspacing*4 + 15 + 20)
+    .attr('id',"SeasonResult")
+    .text("-")
+    .attr('font-size','8pt')
+    .attr('stroke','white')
+  leftside.append('text')
+    .attr('x',padding)
+    .attr('y',leftsidestatsheight + padding + subspacing*4 + 15 + 35)
+    .attr('id',"SeasonResult2")
+    .text("")
+    .attr('font-size','8pt')
+    .attr('stroke','white')
+
+  leftside.append('text')
+    .attr('x',padding)
+    .attr('y',leftsidestatsheight + padding + subspacing*2)
+    .text("Super Bowl")
+    .attr('font-size','8pt')
+    .attr('stroke','#6a6a6a')
+  leftside.append('text')
+    .attr('x',padding)
+    .attr('y',leftsidestatsheight + padding + subspacing*2 + 15)
+    .text("Championships")
+    .attr('font-size','8pt')
+    .attr('stroke','#6a6a6a')
+  leftside.append('text')
+    .attr('x',padding)
+    .attr('y',leftsidestatsheight + padding + subspacing*2 + 15 + 20)
+    .attr('id',"Championships")
+    .text("-")
+    .attr('font-size','8pt')
+    .attr('stroke','white')
+
+  leftside.append('text')
+    .attr('x',padding)
+    .attr('y',leftsidestatsheight + padding)
+    .text("Division")
+    .attr('font-size','8pt')
+    .attr('stroke','#6a6a6a')
+  leftside.append('text')
+    .attr('x',padding)
+    .attr('y',leftsidestatsheight + padding + 20)
+    .attr('id',"Division")
+    .text("-")
+    .attr('font-size','8pt')
+    .attr('stroke','white')
+    
+}
+
+function rightsideInitial(){
+
+   rightside.append('rect')
+    .attr('class','rightsidestats')
+    .attr('x',0)
+    .attr('y',0)
+    .attr('width',rightsidewidth)
+    .attr('height',rightsideheight)
+    .attr('rx','30px')
+    .attr('fill','black')
+    .attr('stroke','#6a6a6a')
+    .attr('stroke-width',1.5)
+
+  rightside.append('circle')
+    .attr('cx',padding + smallcirclesize)
+    .attr('cy',padding)
+    .attr('r',smallcirclesize)
+    .attr('id',"rightsidecircle1")
+    .attr('fill','none')
+    .attr('stroke','white')
+    .attr('stroke-width',.5)
+    .attr('opacity',0)
+  rightside.append('svg:image')
+    .attr('x',padding + smallcirclesize - smallcirclesize * 1/1.414)
+    .attr('y',padding - smallcirclesize * 1/1.414)
+    .attr('width',smallcirclesize * 2/1.414)
+    .attr('height',smallcirclesize * 2/1.414)
+    .attr('id',"rightsidelogo1")
+  rightside.append('text')
+    .attr('x',padding + smallcirclesize + 2*smallcirclesize + 4)
+    .attr('y',padding + 2)
+    .text("")
+    .attr('id','vs')
+    .attr('text-anchor','middle')
+    .attr('font-size','8pt')
+    .attr('stroke','#6a6a6a')
+  rightside.append('circle')
+    .attr('cx',padding + smallcirclesize + 3*smallcirclesize + 20)
+    .attr('cy',padding)
+    .attr('r',smallcirclesize)
+    .attr('id',"rightsidecircle2")
+    .attr('fill','none')
+    .attr('stroke','#35bd67')
+    .attr('stroke-width',.5)
+    .attr('opacity',0)
+  rightside.append('svg:image')
+    .attr('x',padding + smallcirclesize + 3*smallcirclesize + 20 - smallcirclesize * 1/1.414)
+    .attr('y',padding - smallcirclesize * 1/1.414)
+    .attr('width',smallcirclesize * 2/1.414)
+    .attr('height',smallcirclesize * 2/1.414)
+    .attr('id',"rightsidelogo2")
+
+
+  rightside.append('text')
+    .attr('x',padding)
+    .attr('y',padding + smallcirclesize*2 + paddingsmall)
+    .text("Total Revenue")
+    .attr('font-size','8pt')
+    .attr('stroke','#6a6a6a')
+  rightside.append('text')
+    .attr('x',padding + 120)
+    .attr('y',padding + smallcirclesize*2 + paddingsmall + 2)
+    .attr('id','TotalRevenue')
+    .text("-")
+    .attr('font-size','11pt')
+    .attr('stroke','white')
+  rightside.append('rect')
+    .attr('x',paddingsmall)
+    .attr('y',padding + smallcirclesize*2 + paddingsmall + 20)
+    .attr('width',rightsidewidth - 2*paddingsmall)
+    .attr('height',8)
+    .attr('rx',3)
+    .attr('stroke','#6a6a6a')
+    .attr('stroke-width',2.4)
+  rightside.append('rect')
+    .attr('x',paddingsmall + widthScale(296))
+    .attr('y',padding + smallcirclesize*2 + paddingsmall + 20 + 1.6)
+    .attr('width',0)
+    .attr('height',4.8)
+    .attr('rx',3)
+    .attr('id','LocalRevenuerect')
+    .attr('fill','white')
+    .attr('stroke-width',0)
+  rightside.append('rect')
+    .attr('x',paddingsmall + 1)
+    .attr('y',padding + smallcirclesize*2 + paddingsmall + 20 + 1.6)
+    .attr('width',widthScale(296))
+    .attr('height',4.8)
+    .attr('rx',0)
+    .attr('id','NationalRevenuerect')
+    .attr('stroke','none')
+    .attr('stroke-width',0)
+  rightside.append('rect')
+    .attr('x',paddingsmall + 1 + widthScale(296) - 2)
+    .attr('y',padding + smallcirclesize*2 + paddingsmall + 15)
+    .attr('width',3)
+    .attr('height',20)
+    .attr('rx',3)
+    .attr('id','verticalrect1')
+    .attr('opacity',0.7)
+    .attr('fill','white')
+    .attr('stroke','none')
+    .attr('stroke-width',0)
+  rightside.append('text')
+    .attr('x',paddingsmall + 1 + widthScale(296) - 2)
+    .attr('y',padding + smallcirclesize*2 + paddingsmall + 52.5)
+    .attr('id','verticaltext1')
+    .attr('text-anchor','middle')
+    .text('')
+    .attr('stroke','white')
+    .attr('font-size','7pt')
+  rightside.append('rect')
+    .attr('x',paddingsmall + 1 + widthScale(296) - 2)
+    .attr('y',padding + smallcirclesize*2 + paddingsmall + 15)
+    .attr('width',3)
+    .attr('height',20)
+    .attr('rx',3)
+    .attr('id','verticalrect2')
+    .attr('opacity',0)
+    .attr('fill','#35bd67')
+    .attr('stroke','none')
+    .attr('stroke-width',0)
+  rightside.append('text')
+    .attr('x',paddingsmall + 1 + widthScale(296) - 2)
+    .attr('y',padding + smallcirclesize*2 + paddingsmall + 52.5)
+    .attr('id','verticaltext2')
+    .attr('text-anchor','middle')
+    .text('')
+    .attr('stroke','#35bd67')
+    .attr('font-size','7pt')
+
+  var spacing = 48
+  rightside.append('text')
+    .attr('x',padding)
+    .attr('y',padding + smallcirclesize*2 + paddingsmall + 20 + spacing + 8)
+    .text("National Revenue")
+    .attr('font-size','8pt')
+    .attr('stroke','#6a6a6a')
+  rightside.append('text')
+    .attr('x',padding + 120)
+    .attr('y',padding + smallcirclesize*2 + paddingsmall + 20 + spacing + 8 + 2)
+    .attr('id','NationalRevenue')
+    .text("-")
+    .attr('font-size','11pt')
+    .attr('stroke','white')
+  rightside.append('text')
+    .attr('x',padding)
+    .attr('y',padding + smallcirclesize*2 + paddingsmall + 20 + spacing*2)
+    .text("Local Revenue")
+    .attr('font-size','8pt')
+    .attr('stroke','#6a6a6a')
+  rightside.append('text')
+    .attr('x',padding + 120)
+    .attr('y',padding + smallcirclesize*2 + paddingsmall + 20 + spacing*2 + 2)
+    .attr('id','LocalRevenue')
+    .text("-")
+    .attr('font-size','11pt')
+    .attr('stroke','white')
+}
+
+function graphInitial(){
+
+  var midcircle = svg.append('circle')
+      .attr('cx',cx)
+      .attr('cy',cy)
+      .attr('r',rad)
+      .attr('fill','black ')
+
+  var scalecircle = svg.append('circle')
+      .attr('cx',cx)
+      .attr('cy',cy)
+      .attr('r',rad+lengthScale(2000))
+      .attr('fill','none')
+      .attr('stroke','#6a6a6a')
+      .attr('opacity',.3)
+  var scalerect = svg.append('rect')
+      .attr('x',cx - 30)
+      .attr('y',cy-rad-lengthScale(2000))
+      .attr('width',30)
+      .attr('height',15)
+      .attr('fill','black')
+  var scaletext = svg.append('text')
+      .attr('x',cx - 25)
+      .attr('y',cy-rad-lengthScale(2000) + 5)
+      .text('$2B')
+      .attr('font-size','8pt')
+      .attr('stroke','#6a6a6a')
+      .attr('opacity',.7)
+  var scalecircle2 = svg.append('circle')
+      .attr('cx',cx)
+      .attr('cy',cy)
+      .attr('r',rad+lengthScale(3000))
+      .attr('fill','none')
+      .attr('stroke','#6a6a6a')
+      .attr('opacity',.3)
+   var scalerect2 = svg.append('rect')
+      .attr('x',cx - 30)
+      .attr('y',cy-rad-lengthScale(3000))
+      .attr('width',30)
+      .attr('height',15)
+      .attr('fill','black')
+  var scaletext2 = svg.append('text')
+      .attr('x',cx - 25)
+      .attr('y',cy-rad-lengthScale(3000) + 5)
+      .text('$3B')
+      .attr('font-size','8pt')
+      .attr('stroke','#6a6a6a')
+      .attr('opacity',.7)
+  var scalecircle3 = svg.append('circle')
+      .attr('cx',cx)
+      .attr('cy',cy)
+      .attr('r',rad+lengthScale(4000))
+      .attr('fill','none')
+      .attr('stroke','#6a6a6a')
+      .attr('opacity',.3)
+  var scalerect3 = svg.append('rect')
+      .attr('x',cx - 30)
+      .attr('y',cy-rad-lengthScale(4000))
+      .attr('width',30)
+      .attr('height',15)
+      .attr('fill','black')
+  var scaletext3 = svg.append('text')
+      .attr('x',cx - 25)
+      .attr('y',cy-rad-lengthScale(4000) + 5)
+      .text('$4B')
+      .attr('font-size','8pt')
+      .attr('stroke','#6a6a6a')
+      .attr('opacity',.7)
+  var scalecircle4 = svg.append('circle')
+      .attr('cx',cx)
+      .attr('cy',cy)
+      .attr('r',rad+lengthScale(5000))
+      .attr('fill','none')
+      .attr('stroke','#6a6a6a')
+      .attr('opacity',.3)
+  var scalerect4 = svg.append('rect')
+      .attr('x',cx - 30)
+      .attr('y',cy-rad-lengthScale(5000))
+      .attr('width',30)
+      .attr('height',15)
+      .attr('fill','black')
+  var scaletext4 = svg.append('text')
+      .attr('x',cx - 25)
+      .attr('y',cy-rad-lengthScale(5000) + 5)
+      .text('$5B')
+      .attr('font-size','8pt')
+      .attr('stroke','#6a6a6a')
+      .attr('opacity',.7)
+
+  alldata.forEach(function(franchise,i){
+    var rand = Math.random() - .5;
+    var angle = 360 * franchise['Initial Rank']/33 //+ rand * 2
+    var g = svg.append('g')
+    .attr('transform','rotate(' + angle + ',' + cx + "," + cy + ')')
+    //.attr('transform','rotate(' + (360 * i/33) + ',' + cx + "," + cy + ')')
+
+    g.append("path")
+      .attr("d", function() {
+          var d = "M" + cx + "," + cy;
+          d += " " + cx + "," + (cy - lengthScale(franchise["Total Value"]) - rad);
+          return d;
+      })     
+      .attr("stroke", '#6a6a6a')
+      .attr('stroke-width',1)
+      .attr('opacity',.75)
+
+    var colorcircle = g.append('circle')
+      .attr('cx',cx)
+      .attr('cy',cy - lengthScale(franchise["Total Value"]) - rad - radScale(franchise["Total Value"]))
+      .attr('r',radScale(franchise["Total Value"]))
+      .attr('fill',franchise["Color"])
+
+      var logo = g.append('svg:image')
+        .attr('class','logo')
+        .attr('x',cx - radScale(franchise["Total Value"]) * 1/1.414)
+        .attr('y',cy - lengthScale(franchise["Total Value"]) - rad - radScale(franchise["Total Value"]) - radScale(franchise["Total Value"]) * 1/1.414)
+        .attr('width',radScale(franchise["Total Value"]) * 2/1.414)
+        .attr('height',radScale(franchise["Total Value"]) * 2/1.414)
+        .attr("xlink:href", "Logos/" + franchise["Team"] + ".png")
+        .style("pointer-events", "none")
+        .attr('transform','rotate(' + (-angle) + ',' 
+                                    + (cx) + "," 
+                                    + (cy - lengthScale(franchise["Total Value"]) - rad - radScale(franchise["Total Value"])) + ')')  
+
+      colorcircle.on("mouseover",function(){
+            onMouseoverCircle(logo, colorcircle,franchise)
+            g.raise()
+            midcircle.raise()
+            arcG.raise()
+      })
+      .on("mouseout",function(){
+            onMouseoutCircle(logo, colorcircle,franchise)
+      })
+      .on("click",function(){
+            onClickCircle(logo, colorcircle,franchise)
+      })
+
+      groups.push(g)
+      circles[franchise['Team']] = colorcircle;
+      logos[franchise['Team']] = logo;
+    })
+
+  var arcData = [
+      {name: "<< More Valuable",  value: 90},
+      {name: "None",   value: 180},
+      {name: "None",    value: 0},
+      {name: "None",    value: 0},
+      {name: "None",    value: 0},
+      {name: "None",    value: 0},
+      {name: "Less Valuable >>", value: 80},
+      {name: "None",    value: 10}
+      ]
+
+  //Draw the arcs themselves
+    arcG.selectAll(".labelArc")
+      .data(pie(arcData))
+      .enter().append("path")
+      .attr("class", "labelArc")
+      .attr("id", function(d,i) { return "labelArc_"+i; })
+      .attr('fill', function(d){ return (d.data.name != "None" ? '#2a2a2a': 'none')})
+      .attr('stroke', 'none')
+      .attr("d", arc);
+    //Append the month names within the arcs
+    arcG.selectAll(".labelText")
+      .data(arcData)
+      .enter().append("text")
+      .attr("class", "labelText")
+      .attr("x", function(d,i) { return (d.name != "<< More Valuable" ? 17 : 5); }) //Move the text from the start angle of the arc
+      .attr("dy", 14) //Move the text down
+      .attr('fill', 'green')
+      .attr('stroke', 'white')
+      .attr('font-size', '8pt')
+      .style('letter-spacing','0.2em')
+      .append("textPath")
+      .attr('id',function(d,i) { return "labelText_"+i; })
+      .attr("xlink:href",function(d,i){return "#labelArc_"+i;})
+            .text(function(d){return (d.name != "None" ? d.name : "");}) 
+
+      midcircle.raise()
+      arcG.raise()
+
+  }
+
+function initial(){
+  graphInitial();
+  headerInitial();
+  //circlesInitial();
+  leftsideInitial();
+  rightsideInitial();
+
+}
+
+function onMouseoverCircle(l,c,d){
+  if (clicked == ""){
+    l.attr('x',cx - (rad+5) * 1/1.414)
+      .attr('y',cy - lengthScale(d["Total Value"]) - rad - (radScale(d["Total Value"])) - (rad+5) * 1/1.414)
+      .attr('height',(rad + 5) * 2/1.414)
+      .attr('width',(rad + 5) * 2/1.414)
+    c.attr('r',rad + 5)
+
+    headerlogo.attr("xlink:href", "Logos/" + d["Team"] + ".png")
+    headercircle.attr('fill',d["Color"]).attr('opacity',1)
+    headertext.text(d["Team"]).attr('x',padding + nfllogosize + 15 + d["Total Value Rank"].length * 20)
+    headerrank.text(d["Total Value Rank"])
+
+    svg.select("#TotalValue").text('$' + formatNumber(d["Total Value"]) + 'M')
+    if (d["Team-Related Businesses and Property"] == 0){
+      svg.select("#TeamRelatedDefault1").attr('opacity',1)
+      svg.select("#TeamRelatedDefault2").attr('opacity',1)
+      svg.select("#TeamRelated").text('')
+    } else {
+      svg.select("#TeamRelated").text('$' + formatNumber(d["Team-Related Businesses and Property"]) + 'M')
+      svg.select("#TeamRelatedDefault1").attr('opacity',0)
+      svg.select("#TeamRelatedDefault2").attr('opacity',0)
+    }
+    svg.select("#TeamValue").text('$' + formatNumber(d["Team Value"]) + "M")
+    var splitowner = splittext(d["Principal Owner"],leftsidewidth-padding)
+    svg.select("#PrincipalOwner").text(splitowner[0])
+    svg.select("#PrincipalOwner2").text(splitowner[1])
+    svg.select("#PrincipalOwner3").text(splitowner[2])
+    var split2019 = splittext(d["2019 Season Result"],leftsidewidth-padding)
+    svg.select("#SeasonResult").text(split2019[0])
+    svg.select("#SeasonResult2").text(split2019[1])
+    svg.select("#Championships").text(d["Super Bowl Championships"])
+    svg.select("#Division").text(d["Conference"] + ' ' + d["Division"])
+
+    svg.select("#rightsidecircle1").attr('fill',d["Color"]).attr('opacity',1)
+    svg.select('#rightsidelogo1').attr("xlink:href", "Logos/" + d["Team"] + ".png")
+    svg.select("#TotalRevenue").text('$' + formatNumber(d['Total Revenue']) + 'M')
+    svg.select("#NationalRevenue").text('$' + formatNumber(d['National Revenue']) + 'M')
+    svg.select("#LocalRevenue").text('$' + formatNumber(d['Local Revenue']) + 'M')
+    svg.select('#NationalRevenuerect').attr('fill','#1d1d1d')
+    svg.select('#LocalRevenuerect')
+      .transition().duration(1000).attr('width',widthScale(d['Local Revenue']))
+    svg.select('#verticalrect1')
+      .transition().duration(1000).attr('x',paddingsmall + widthScale(d['Total Revenue']) - 2)
+    svg.select('#verticaltext1')
+      .text(d['Team Revenue Rank'])
+      .transition().duration(1000).attr('x',paddingsmall + widthScale(d['Total Revenue']) - 2)
+
+  } 
+  else if (clicked != d["Team"]){
+    l.attr('x',cx - (rad+5) * 1/1.414)
+      .attr('y',cy - lengthScale(d["Total Value"]) - rad - (radScale(d["Total Value"])) - (rad+5) * 1/1.414)
+      .attr('height',(rad + 5) * 2/1.414)
+      .attr('width',(rad + 5) * 2/1.414)
+    c.attr('r',rad + 5)
+
+    svg.select('#vs').text('vs.')
+    svg.select("#rightsidecircle2").attr('fill',d["Color"]).attr('opacity',1)
+    svg.select('#rightsidelogo2').attr("xlink:href", "Logos/" + d["Team"] + ".png")
+    svg.select('#verticalrect2').attr('opacity',.7)
+      .transition().duration(1000).attr('x',paddingsmall + widthScale(d['Total Revenue']) - 2)
+    svg.select('#verticaltext2')
+      .text(d['Team Revenue Rank'])
+      .transition().duration(1000).attr('x',paddingsmall + widthScale(d['Total Revenue']) - 2)
+  }
+
+  hover = d["Team"];
+
+  Object.keys(circles).forEach(function(team){
+      if (team != hover && team != clicked){
+        circles[team].attr('opacity',0.5)
+        logos[team].attr('opacity',0.5)
+      } else {
+        circles[team].attr('opacity',1)
+        logos[team].attr('opacity',1)
+      }
+  })
+  svg.selectAll('.rowcircles').attr('opacity',function(d){
+    return (d['Team'] != hover && d['Team'] != clicked ? 0.5 : 1)
+  })
+  svg.selectAll('.rowlogos').attr('opacity',function(d){
+    return (d['Team'] != hover && d['Team'] != clicked ? 0.5 : 1)
+  })
+
+   arcG.raise()
+}
+
+function splittext(text,w){
+  var splitowner = text.split(" ")
+  var maxchars = w/6.25
+  var owner1 = ""
+  var owner2 = ""
+  var owner3 = ""
+  var i = 0;
+  while (owner1.length < maxchars && i < splitowner.length && owner1.length + splitowner[i].length <= maxchars){
+      owner1 += splitowner[i] + " "
+      i++
+  }
+  while (owner2.length < maxchars && i < splitowner.length && owner2.length + splitowner[i].length <= maxchars){
+    owner2 += splitowner[i] + " "
+    i++
+  }
+  while (owner3.length < maxchars && i < splitowner.length && owner3.length + splitowner[i].length <= maxchars){
+    owner3 += splitowner[i] + " "
+    i++
+  }
+  return([owner1,owner2,owner3])
+}
+
+function onMouseoutCircle(l,c,d){
+  hover = "";
+  if (clicked == ""){
+    l.attr('x',cx - radScale(d["Total Value"]) * 1/1.414)
+      .attr('y',cy - lengthScale(d["Total Value"]) - rad - radScale(d["Total Value"]) - radScale(d["Total Value"]) * 1/1.414)
+      .attr('height',radScale(d["Total Value"]) * 2/1.414)
+      .attr('width',radScale(d["Total Value"]) * 2/1.414)
+    c.attr('r',radScale(d["Total Value"]))
+
+    headerlogo.attr("xlink:href", "NFLlogo.png")
+    headercircle.attr('fill',d["Color"]).attr('opacity',0)
+    headertext.attr('x',padding + nfllogosize + 8)
+      .text('NFL Franchise Valuations')
+    headerrank.text(' ')
+
+    svg.select("#TotalValue").text("-")
+    svg.select("#TeamRelated").text("-")
+    svg.select("#TeamRelatedDefault1").attr('opacity',0)
+    svg.select("#TeamRelatedDefault2").attr('opacity',0)
+    svg.select("#TeamValue").text("-")
+    svg.select("#PrincipalOwner").text("-")
+    svg.select("#PrincipalOwner2").text("")
+    svg.select("#PrincipalOwner3").text("")
+    svg.select("#SeasonResult").text("-")
+    svg.select("#SeasonResult2").text("")
+    svg.select("#Championships").text("-")
+    svg.select("#Division").text("-")
+
+    svg.select("#rightsidecircle1").attr('fill','none').attr('opacity',0)
+    svg.select('#rightsidelogo1').attr("xlink:href", "")
+    svg.select('#vs').text('')
+    svg.select("#TotalRevenue").text('-')
+    svg.select("#NationalRevenue").text('-')
+    svg.select("#LocalRevenue").text('-')
+    setTimeout(function(){
+      if(hover == "" || hover == clicked){
+        svg.select('#NationalRevenuerect').attr('fill','none')
+        svg.select('#LocalRevenuerect')
+          .transition().duration(1000).attr('width' ,0)
+        svg.select('#verticalrect1')
+          .transition().duration(1000).attr('x',paddingsmall + widthScale(296) - 2)
+        svg.select('#verticaltext1').text('')
+          .transition().duration(1000).attr('x',paddingsmall + 1 + widthScale(296) - 2)
+      }
+    },200)
+
+    Object.keys(circles).forEach(function(team){
+      circles[team].attr('opacity',1)
+      logos[team].attr('opacity',1)
+    })
+    svg.selectAll('.rowcircles').attr('opacity',1)
+    svg.selectAll('.rowlogos').attr('opacity',1)
+  }
+  else if (clicked != d["Team"]){
+    l.attr('x',cx - radScale(d["Total Value"]) * 1/1.414)
+      .attr('y',cy - lengthScale(d["Total Value"]) - rad - radScale(d["Total Value"]) - radScale(d["Total Value"]) * 1/1.414)
+      .attr('height',radScale(d["Total Value"]) * 2/1.414)
+      .attr('width',radScale(d["Total Value"]) * 2/1.414)
+    c.attr('r',radScale(d["Total Value"]))
+
+    setTimeout(function(){
+      if(hover == "" || hover == clicked){
+        svg.select('#vs').text('')
+        svg.select("#rightsidecircle2").attr('fill','none').attr('opacity',0)
+        svg.select('#rightsidelogo2').attr("xlink:href", "")
+        svg.select('#verticalrect2').attr('opacity',0).attr('x',paddingsmall + 1 + widthScale(296) - 2)
+        svg.select('#verticaltext2').text('').attr('x',paddingsmall + 1 + widthScale(296) - 2)
+      }
+    },200)
+
+    circles[d['Team']].attr('opacity',.5)
+    logos[d['Team']].attr('opacity',.5)
+    svg.selectAll('.rowcircles').attr('opacity',function(d){
+      return (d['Team'] != hover && d['Team'] != clicked ? 0.5 : 1)
+    })
+    svg.selectAll('.rowlogos').attr('opacity',function(d){
+      return (d['Team'] != hover && d['Team'] != clicked ? 0.5 : 1)
+    })
+  }
+}
+
+function onClickCircle(l,c,d){
+  if (clicked == ""){
+    clicked = d["Team"]
+    clickedcircle = c;
+    clickedlogo = l;
+    c.attr('stroke-width',2)
+    .attr('stroke','white')
+  }
+  else if (clicked != d["Team"]){
+    var t = alldata.filter(function(team){
+      return team["Team"] == clicked;
+    })[0]
+    clickedcircle.attr('stroke-width',0)
+    .attr('r',radScale(t["Total Value"]))
+    clickedlogo.attr('x',cx - radScale(t["Total Value"]) * 1/1.414)
+      .attr('y',cy - lengthScale(t["Total Value"]) - rad - radScale(t["Total Value"]) - radScale(t["Total Value"]) * 1/1.414)
+      .attr('height',radScale(t["Total Value"]) * 2/1.414)
+      .attr('width',radScale(t["Total Value"]) * 2/1.414)
+
+    clicked = d["Team"]
+    clickedcircle = c;
+    clickedlogo = l;
+    c.attr('stroke-width',2)
+    .attr('stroke','white')
+
+    headerlogo.attr("xlink:href", "Logos/" + d["Team"] + ".png")
+    headercircle.attr('fill',d["Color"]).attr('opacity',1)
+    headertext.text(d["Team"]).attr('x',padding + nfllogosize + 15 + d["Total Value Rank"].length * 20)
+    headerrank.text(d["Total Value Rank"])
+
+    svg.select("#TotalValue").text('$' + formatNumber(d["Total Value"]) + 'M')
+        if (d["Team-Related Businesses and Property"] == 0){
+      svg.select("#TeamRelatedDefault1").attr('opacity',1)
+      svg.select("#TeamRelatedDefault2").attr('opacity',1)
+      svg.select("#TeamRelated").text('')
+    } else {
+      svg.select("#TeamRelated").text('$' + formatNumber(d["Team-Related Businesses and Property"]) + 'M')
+      svg.select("#TeamRelatedDefault1").attr('opacity',0)
+      svg.select("#TeamRelatedDefault2").attr('opacity',0)
+    }
+    svg.select("#TeamValue").text('$' + formatNumber(d["Team Value"]) + "M")
+    var splitowner = splittext(d["Principal Owner"],leftsidewidth-padding)
+    svg.select("#PrincipalOwner").text(splitowner[0])
+    svg.select("#PrincipalOwner2").text(splitowner[1])
+    svg.select("#PrincipalOwner3").text(splitowner[2])
+    var split2019 = splittext(d["2019 Season Result"],leftsidewidth-padding)
+    svg.select("#SeasonResult").text(split2019[0])
+    svg.select("#SeasonResult2").text(split2019[1])
+    svg.select("#Championships").text(d["Super Bowl Championships"])
+    svg.select("#Division").text(d["Conference"] + ' ' + d["Division"])
+
+    svg.select("#rightsidecircle1").attr('fill',d["Color"]).attr('opacity',1)
+    svg.select('#rightsidelogo1').attr("xlink:href", "Logos/" + d["Team"] + ".png")
+    svg.select("#TotalRevenue").text('$' + formatNumber(d['Total Revenue']) + 'M')
+    svg.select("#NationalRevenue").text('$' + formatNumber(d['National Revenue']) + 'M')
+    svg.select("#LocalRevenue").text('$' + formatNumber(d['Local Revenue']) + 'M')
+    svg.select('#vs').text('')
+    svg.select("#rightsidecircle2").attr('fill','none').attr('opacity',0)
+    svg.select('#rightsidelogo2').attr("xlink:href", "")
+    svg.select('#NationalRevenuerect').attr('fill','#1d1d1d')
+    svg.select('#LocalRevenuerect')
+      .transition().duration(1000).attr('width',widthScale(d['Local Revenue']))
+    svg.select('#verticalrect1')
+      .transition().duration(1000).attr('x',paddingsmall + widthScale(d['Total Revenue']) - 2)
+    svg.select('#verticaltext1')
+      .text(d['Team Revenue Rank'])
+      .transition().duration(1000).attr('x',paddingsmall + widthScale(d['Total Revenue']) - 2)
+    svg.select('#verticalrect2').attr('opacity',0).attr('x',paddingsmall + 1 + widthScale(296) - 2)
+        svg.select('#verticaltext2').text('').attr('x',paddingsmall + 1 + widthScale(296) - 2)
+
+  } else {
+    clicked = ""
+    c.attr('stroke-width',0)
+    clickedcircle = undefined;
+    clickedlogo = undefined;
+  }
+
+    Object.keys(circles).forEach(function(team){
+      if (team != hover && team != clicked){
+        circles[team].attr('opacity',0.5)
+        logos[team].attr('opacity',0.5)
+      } else {
+        circles[team].attr('opacity',1)
+        logos[team].attr('opacity',1)
+      }
+    })
+    svg.selectAll('.rowcircles').attr('opacity',function(d){
+      return ((d['Team'] != hover && d['Team'] != clicked) ? 0.5 : 1)
+    })
+    svg.selectAll('.rowlogos').attr('opacity',function(d){
+      return ((d['Team'] != hover && d['Team'] != clicked) ? 0.5 : 1)
+    })
+
+    arcG.raise()
+}
+
+function formatNumber(num) {
+  return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
+}
+
+function sortBy(variable){
+  groups.forEach(function(gp,i){
+    var franchise = alldata[i];
+    var rand = Math.random() - .5;
+    var angle = 360 * franchise[variable]/33 //+ rand * 2
+    var prevangle = 360 * franchise[sortable]/33
+    gp
+    .transition()
+    .duration(3500)
+    .attrTween('transform' ,  function(){ return d3.interpolateString( "rotate(" + prevangle + "," + cx + "," + cy + ")", "rotate(" + angle + "," + cx + "," + cy + ")" ) })
+
+    gp.select('.logo')
+    .transition()
+    .duration(3500)
+    .attrTween('transform' ,  function(){ return d3.interpolateString( "rotate(" + -prevangle + "," + cx + "," + (cy - lengthScale(franchise["Total Value"]) - rad - radScale(franchise["Total Value"])) + ")", "rotate(" + -angle + "," + cx + "," + (cy - lengthScale(franchise["Total Value"]) - rad - radScale(franchise["Total Value"])) + ")" ) })
+  })
+
+   /* svg.selectAll('.rowcircles')
+      .transition()
+      .duration(35000)
+      .attr('cx',function(d){
+        return padding+smallcirclesize + (width-smallcirclesize-padding) * (d[variable] % 16) / 16;
+      })
+      .attr('cy',function(d){
+        return padding + nfllogosize + padding*2 + 15 + (d[variable] >= 16 ? padding*1.5 : 0)
+      })
+
+    svg.selectAll('.rowlogos')
+      .transition()
+      .duration(3500)
+      .attr('x',function(d){
+        return padding+smallcirclesize + (width-smallcirclesize-padding) * (d[variable] % 16) / 16 - smallcirclesize * 1/1.414
+      })
+      .attr('y',function(d){
+        return padding + nfllogosize + padding*2 + 15 - smallcirclesize * 1/1.414 + (d[variable] >= 16 ? padding*1.5 : 0)
+      }) */
+      var arcData;
+      if (variable == "Team Revenue Rank No"){
+        arcData = [{name: "<< More Revenue",  value: 90},
+        {name: "None",   value: 180},
+        {name: "None",    value: 0},
+        {name: "None",    value: 0},
+        {name: "None",    value: 0},
+        {name: "None",    value: 0},
+        {name: "Less Revenue >>", value: 80},
+        {name: "None",    value: 10}
+        ]
+      } else if (variable == "Total Value Rank No"){
+        arcData = [{name: "<< More Valuable",  value: 90},
+        {name: "None",   value: 180},
+        {name: "None",    value: 0},
+        {name: "None",    value: 0},
+        {name: "None",    value: 0},
+        {name: "None",    value: 0},
+        {name: "Less Valuable >>", value: 80},
+        {name: "None",    value: 10}
+        ]
+      } else if (variable == "Super Bowl Championships Rank No") {
+          arcData = [
+          {name: "6",  value: 2},
+          {name: "5",   value: 2},
+          {name: "4",    value: 2},
+          {name: "3",    value: 3},
+          {name: "2",    value: 4},
+          {name: "1",    value: 7},
+          {name: "0",    value: 13.5}
+          ]
+      }
+        arcG.selectAll("textPath").remove()
+        arcG.selectAll(".labelArc")
+          .data(pie(arcData))
+          .attr("class", "labelArc")
+          .attr('fill', function(d){ return (d.data.name != "None" ? '#2a2a2a': 'none')})
+          .attr('stroke', 'none')
+          .attr("d", arc);
+        arcG.selectAll(".labelText").data(arcData)
+          .attr("class", "labelText")
+          .attr("x", function(d,i) { return (d.name != "<< More Valuable" ? 5 : 5); }) //Move the text from the start angle of the arc
+          .attr("dy", 14) //Move the text down
+          .attr('fill', 'green')
+          .attr('stroke', 'white')
+          .attr('font-size', '8pt')
+          .style('letter-spacing','0.2em')
+          .append("textPath")
+            .attr("xlink:href",function(d,i){return "#labelArc_"+i;})
+            .text(function(d){return (d.name != "None" ? d.name : "");}) 
+        //svg.select('#labelText_0').text('<< More SBs')
+        //svg.select('#labelText_2').text("Less SBs >>")
+
+  sortable = variable;
+}
+
+</script>
+</html>
