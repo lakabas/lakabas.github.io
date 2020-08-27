@@ -1,0 +1,87 @@
+<html>
+<head>
+  <title>NCAA Map</title>
+  <meta charset=utf-8>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://d3js.org/d3.v4.min.js"> </script>
+  <script src="us-states.js"> </script>
+ </head>
+ <style>
+    #tooltip
+  {
+    position: absolute;
+    width: 190px;
+    height: auto;
+    padding: 10px;
+    background-color: white;
+    -webkit-box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.4);
+    -moz-box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.4);
+    box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.4);
+    pointer-events: none;
+  }
+
+  #tooltip.hidden
+  {
+    display: none;
+    -moz-transition: all 0.15s;
+    -o-transition: all 0.15s;
+    -webkit-transition: all 0.15s;
+    transition: all 0.15s;
+  }
+
+   text
+  {
+    fill: #444;
+    font-family: "Georgia";
+    /*text-transform: uppercase;*/
+    letter-spacing: .05em;
+    font-size: 11px;
+  }
+  .label-wrap
+  {
+    border-top: 1px solid gray;
+    margin-bottom: 7px;
+  }
+
+  .label
+  {
+    color: gray;
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 1px;
+    float: left;
+    width: 100px;
+    padding-top: 3px;
+  }
+
+  .label-number
+  {
+    font-size: 15px;
+  }
+
+  #graph {
+  border-width: 5px;
+  border-color: black;
+  border-style: solid;
+}
+
+</style>
+<body>
+ <div id="tooltip" class="hidden">
+          <div id="name-conf">
+            <span id="name">North Carolina State</span>
+            <span id="conference">ACC</span>
+          </div>
+          <div class="label-wrap">
+            <div class="label">Expenses</div>
+            <div class="label-number" id="expenses">$13456789</div>
+          </div>
+          <div class="label-wrap">
+            <div class="label">Revenue</div>
+            <div class="label-number" id="revenue">$26456789</div>
+          </div>
+  </div>
+  <svg id="graph" height="780px" width="1200px"></svg>
+  <script src="mapscript.js"> </script>
+</body>
+</html>
