@@ -7,10 +7,28 @@
   <script src="us-states.js"> </script>
  </head>
  <style>
-    #tooltip
+@font-face {
+  font-family: myFirstFont;
+  src: url(Geograph/Geograph-Thin.otf);
+}
+@font-face {
+  font-family: mySecondFont;
+  src: url(Geograph/Geograph-Medium.otf);
+}
+body{
+  font-family:myFirstFont;
+  letter-spacing:0.05em;
+  margin-left: 0px;
+}
+#name{
+  font-family:mySecondFont;
+  letter-spacing:0.05em;
+  margin-left: 0px;
+}
+  #tooltip
   {
     position: absolute;
-    width: 190px;
+    width: 320px;
     height: auto;
     padding: 10px;
     background-color: white;
@@ -31,8 +49,7 @@
 
    text
   {
-    fill: #444;
-    font-family: "Georgia";
+    color: black;
     /*text-transform: uppercase;*/
     letter-spacing: .05em;
     font-size: 11px;
@@ -45,12 +62,12 @@
 
   .label
   {
-    color: gray;
+    color: black;
     text-transform: uppercase;
     font-size: 11px;
     letter-spacing: 1px;
     float: left;
-    width: 100px;
+    width: 200px;
     padding-top: 3px;
   }
 
@@ -73,12 +90,12 @@
             <span id="conference">ACC</span>
           </div>
           <div class="label-wrap">
-            <div class="label">Expenses</div>
-            <div class="label-number" id="expenses">$13456789</div>
+            <div class="label">Football Ticket Revenue </div>
+            <div class="label-number" id="tix">$13456789</div>
           </div>
           <div class="label-wrap">
-            <div class="label">Revenue</div>
-            <div class="label-number" id="revenue">$26456789</div>
+            <div class="label">Recieved Guarantees</div>
+            <div class="label-number" id="guarantees">$26456789</div>
           </div>
   </div>
   <svg id="graph" height="780px" width="1200px"></svg>
