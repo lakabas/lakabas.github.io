@@ -6,7 +6,7 @@
     var maxCircle = 20;
     var projection = d3.geoAlbers().translate([w/2, 350])
                            // to shrink/grow the map, 1000 = 100%
-                           .scale([1300]);
+                           .scale([1200]);
 
     // Define path generator
 	var path = d3.geoPath() // path generator that will convert GeoJSON to SVG paths
@@ -28,6 +28,7 @@
                 "Napa": "#24B086",
                 "Santa Cruz": "#BB998C",
                 "San Francisco": "#473C6C"};
+    var redblueColorScale = ["#ff0000", "#ff8080", "#ffffff", "#80a1ff", "#0044ff"]
     var revScale;
     var expScape;
     var colorScale;
@@ -48,9 +49,8 @@
       expScale = d3.scaleSqrt()
         .domain([0,d3.max(expenses)])
         .range([0,maxCircle])
-      var redblueColorScale = ["#ff0000", "#ff8080", "#ffffff", "#80a1ff", "#0044ff"]
       colorScale = d3.scaleLinear()
-        .domain([.463,.2315,0,-.2315,-.463])
+        .domain([.5,.25,0,-.25,-.5])
         .range(redblueColorScale);
       drawGraph();
     });
@@ -65,8 +65,8 @@
    function mutateRow2(row) {
       row['lat'] = Number(row['lat']);
       row['long'] = Number(row['long']);
-      row['rev'] = Number(row['rev']);
-      row['exp'] = Number(row['exp']);
+      row['tix'] = Number(row['tix']);
+      row['guarantees'] = Number(row['guarantees']);
       if (!Object.keys(conferences).includes(row['conf'])){
         conferences[['conf']] = 0
       } else {
@@ -124,9 +124,15 @@
          ;})
          .style("opacity", 1)
          .attr("class", "schoolCircle")
-         .on("mouseover",handleMouseover)
-         .on("mouseout",handleMouseout)
-         .on("click",handleClick)
+         .on("mouseover",function(d,i){
+            handleMouseover(d,i)
+            d3.select(this).attr('r',10)
+          })
+         .on("mouseout",function(d,i){
+            handleMouseout()
+            d3.select(this).attr('r',7)
+          })
+         //.on("click",handleClick)
 
      //selecting the circles and appending one for each school
       svg2.selectAll("text")
@@ -193,15 +199,23 @@
             .text('(' + d.conf + ')');
         d3.select('#name')
             .text(d.school);
-        d3.select('#expenses')
-            .text("$" + formatNumber(d.exp));
-        d3.select('#revenue')
-            .text("$" + formatNumber(d.rev));
         d3.select("#tooltip").classed("hidden", false);
+        if (d.tix == -1){
+          d3.select('#tix')
+              .text("Data Not Public");
+          d3.select('#guarantees')
+              .text("Data Not Public");
+        } else {
+          d3.select('#tix')
+              .text("$" + formatNumber(d.tix));
+          d3.select('#guarantees')
+              .text("$" + formatNumber(d.guarantees));
+        }
+        
              
   }
 
-  function handleMouseout(d,i){
+  function handleMouseout(){
     d3.select("#tooltip").classed("hidden", true);
   }
 
@@ -240,4 +254,76 @@
               r: radius * 2
             });*/
   }
+
+  var gradients = 0;
+
+  var colorScale2 = d3.scaleLinear()
+    .domain([0,2.5,5,7.5,10])
+    .range(redblueColorScale);
+
+  for (var i = 0; i < 11; i++){
+    svg2.append('rect')
+      .attr('id', 'gradient' + gradients + 'rect' + i)
+      .attr('x',w/2 - 15 * 5 + 15 * i)
+      .attr('y', 40)
+      .attr('width',14)
+      .attr('height',14)
+      .attr('fill', colorScale2(i));
+    console.log(i);
+    console.log(colorScale2(i));
+  }
+
+  svg2.append('text')
+    .attr('id', 'gradientVariable')
+    .attr('class','gradientText')
+    .attr('x',w/2)
+    .attr('y',20)
+    .attr('text-anchor','middle')
+    .text('2016 General Election Results')
+  svg2.append('text')
+    .attr('id', 'gradientMinText')
+    .attr('class','gradientText')
+    .attr('x',w/2 - 15 * 5)
+    .attr('y',80)
+    .attr('text-anchor','middle')
+    .text('Trump + 50')
+  svg2.append('text')
+    .attr('id', 'gradientMaxText')
+    .attr('class','gradientText')
+    .attr('x',w/2 + 15 * 5)
+    .attr('y',80)
+    .attr('text-anchor','middle')
+    .text('Clinton +50')
+  
+  svg2.append("circle")
+         .attr("cx", w/2 + 150)
+         .attr("cy", 30)
+         .attr("r", 7)
+         .style("fill", 'black')
+        .style("stroke", 'black')
+        .style("stroke-width", 1)
+        .style("opacity", 1)
+   svg2.append("circle")
+         .attr("cx", w/2 + 150)
+         .attr("cy", 50)
+         .attr("r", 7)
+         .style("fill", 'white')
+        .style("stroke", 'black')
+        .style("stroke-width", 1)
+        .style("opacity", 1)
+    svg2.append("text")
+         .attr("x", w/2 + 160)
+         .attr("y", 35)
+        //.style("stroke", 'black')
+        .style("font-size", '10pt')
+        .style("opacity", 1)
+        .text('Canceled Football')
+    svg2.append("text")
+         .attr("x", w/2 + 160)
+         .attr("y", 55)
+        //.style("stroke", 'black')
+        .style("font-size", '10pt')
+        .style("opacity", 1)
+        .text('Still Playing Football')
+
 }
